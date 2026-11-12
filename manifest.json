@@ -1,0 +1,16 @@
+{
+  "name": "일정 달력",
+  "short_name": "일정달력",
+  "description": "개인 일정과 약속을 달력에 기록하는 개인용 달력. 반복 일정과 한국 공휴일을 보여주고, 데이터는 폰 안에만 저장됩니다.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#F3F5F1",
+  "theme_color": "#2E6B4E",
+  "lang": "ko",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
