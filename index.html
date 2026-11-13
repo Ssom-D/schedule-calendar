@@ -110,13 +110,6 @@ em,i{font-style:normal}
 .notice span{flex:1}
 .notice button{color:inherit;font-weight:700;text-decoration:underline;white-space:nowrap}
 
-/* 요약 */
-.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:12px 16px 0}
-.summary > div{background:var(--surface);padding:10px 12px;min-width:0}
-.summary .k{font-size:11.5px;color:var(--muted);font-weight:500}
-.summary .v{font-family:var(--mono);font-size:17px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.summary .v small{font-size:12px;font-weight:500;color:var(--muted);font-family:var(--sans);margin-left:2px}
-.summary .k.t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 
 /* 달력 */
 .cal{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 8px 10px;margin:12px 16px 0}
@@ -510,7 +503,7 @@ const I={
 function render(){
   applyTheme();
   const tab=V.tab||'cal';
-  document.getElementById('main').innerHTML=(S.events.some(e=>e.sample)||S.sampleNotes.length?sampleNotice():'')+(tab==='week'?weekPage():summary()+calendar()+selectedDay());
+  document.getElementById('main').innerHTML=(S.events.some(e=>e.sample)||S.sampleNotes.length?sampleNotice():'')+(tab==='week'?weekPage():calendar()+selectedDay());
   document.getElementById('tabbar').innerHTML=`
     <button type="button" class="${tab==='cal'?'on':''}" data-act="tab" data-tab="cal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>달력</button>
     <button type="button" class="${tab==='week'?'on':''}" data-act="tab" data-tab="week"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M9 10v9M15 10v9"/></svg>주간</button>`;
@@ -518,22 +511,6 @@ function render(){
 function sampleNotice(){
   const n=S.events.filter(e=>e.sample).length, m=S.sampleNotes.filter(d=>S.notes[d]).length;
   return `<div class="notice"><span>예시 일정 ${n}개${m?`와 예시 기록 ${m}개`:''}가 들어 있어요. 어떻게 보이는지 살펴본 뒤 지우고 진짜 일정을 넣어 보세요.</span><button type="button" data-act="clear-sample">예시 지우기</button></div>`;
-}
-function summary(){
-  const t=today();
-  const todayN=dayOccurrences(t).length;
-  const [y,m]=V.month.split('-').map(Number);
-  const mFrom=`${y}-${pad(m)}-01`, mTo=`${y}-${pad(m)}-${pad(dim(y,m-1))}`;
-  const monthN=occurrences(mFrom,mTo).filter(o=>o.start>=mFrom).length;
-  const hm=nowHM();
-  const next=occurrences(t,addDays(t,366)).find(o=>o.start>t||(o.start===t&&(o.ev.allDay||(o.ev.time&&o.ev.time>=hm))));
-  let nv='-', nk='예정된 일정 없음';
-  if(next){ const n=diff(t,next.start); nv=n===0?'오늘':n===1?'내일':`D-${n}`; const k=kindOf(next.ev.kind); nk=(k?k.icon+' ':'')+next.ev.title }
-  return `<section class="summary">
-    <div><div class="k">오늘</div><div class="v">${todayN}<small>개</small></div><div class="k t">${esc(kdate(t))}</div></div>
-    <div><div class="k">${m}월</div><div class="v">${monthN}<small>개</small></div><div class="k t">시작일 기준</div></div>
-    <div><div class="k">다음 일정</div><div class="v">${esc(nv)}</div><div class="k t">${esc(nk)}</div></div>
-  </section>`;
 }
 function calendar(){
   const [y,m]=V.month.split('-').map(Number);
