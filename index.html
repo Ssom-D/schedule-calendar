@@ -221,6 +221,11 @@ mark{background:transparent;color:var(--accent);font-weight:700}
 .search input::placeholder{color:var(--muted)}
 .search .clr{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--muted);background:var(--surface2);flex:0 0 auto}
 .search .clr svg{width:14px;height:14px;stroke:currentColor}
+.fchips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}
+.fchips::-webkit-scrollbar{display:none}
+.fchip{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:13px;color:var(--muted)}
+.fchip em{font-size:14px;line-height:1}
+.fchip.on{background:var(--accent);color:var(--accent-ink);border-color:transparent}
 .rescount{padding:12px 4px 0;font-size:12.5px;color:var(--muted);font-weight:500}
 .rescount b{color:var(--ink);font-family:var(--mono)}
 .sheet .list{margin:0}
@@ -273,9 +278,14 @@ select.input{background-image:linear-gradient(45deg,transparent 50%,var(--muted)
 .krow.dragging{transition:none;background:var(--surface);box-shadow:var(--shadow);position:relative;z-index:2;outline:1px solid var(--line)}
 .krow.dragging .input{background:var(--surface)}
 .klist.dragging-list,.klist.dragging-list *{-webkit-user-select:none;user-select:none}
-.selwrap{position:relative}
-.selwrap .sw{position:absolute;left:12px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--c);pointer-events:none}
-.selwrap select{padding-left:34px}
+.dots{display:grid;grid-template-columns:repeat(6,1fr);justify-items:center;gap:8px 4px;padding:2px 0;max-width:300px}
+.dot{position:relative;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.dot input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.dot i{width:22px;height:22px;border-radius:50%;background:var(--c);display:block;transition:transform .1s}
+.dot:has(input:checked){box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--c)}
+.dot:has(input:checked) i{transform:scale(.8)}
+.dot:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:3px}
+.field .k b{color:var(--ink);font-weight:600;margin-left:4px}
 .krow .input{padding:8px 10px;min-height:42px}
 .krow .input.ic{text-align:center;font-size:20px;padding:4px}
 .x{color:var(--muted);width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex:0 0 auto}
@@ -643,7 +653,9 @@ function weekPage(){
 }
 
 /* ====================== 검색 ====================== */
-let Q='';
+let Q='', KF=''; // KF: '' 전체, 'none' 일반, 그 외 종류 id
+const matchKind=ev=>!KF||(KF==='none'?!kindOf(ev.kind):ev.kind===KF);
+const kfLabel=()=>KF==='none'?'일반':(kindOf(KF)?kindOf(KF).icon+' '+kindOf(KF).name:'');
 const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,'');
 function hl(text,q){ // 검색어와 맞는 부분을 강조. 공백 무시 비교라서 원문 글자 위치로 다시 찾는다
   const src=String(text||''); if(!q) return esc(src);
@@ -656,23 +668,35 @@ function hl(text,q){ // 검색어와 맞는 부분을 강조. 공백 무시 비�
 function searchBody(){
   const t=today(), q=norm(Q);
   const section=(title,list,dday)=>list.length?`<div class="eyebrow">${title}</div>`+groupBy(list,o=>o.start<t&&o.end>=t?t:o.start).map(([d,l])=>{ const hol=holidayOf(d); return `<section class="group"><div class="dayhead"><span class="d ${d===t?'today':''}">${esc(kdate(d,d.slice(0,4)!==t.slice(0,4)))}</span>${hol?`<span class="h">${esc(hol)}</span>`:''}<span class="c">${esc(relDay(diff(t,d)))}</span></div><div class="list">${l.map(o=>eventRow(o,{q,dday})).join('')}</div></section>` }).join(''):'';
-  if(!q){
+  if(!q&&!KF){
     const up=occurrences(addDays(t,-60),addDays(t,60)).filter(o=>o.end>=t);
     return up.length?section('다가오는 일정 · 60일',up,false):`<div class="empty" style="padding-top:30px"><b>다가오는 일정이 없어요</b>제목·장소·메모·한 줄 기록에서 찾을 수 있어요.</div>`;
   }
-  const evs=S.events.filter(e=>[e.title,e.place,e.memo].some(v=>norm(v).includes(q)));
+  if(!q){ // 종류만 고른 경우: 그 종류의 일정을 앞뒤 1년치로
+    const occ=occurrences(addDays(t,-366),addDays(t,366)).filter(o=>matchKind(o.ev));
+    const up=occ.filter(o=>o.end>=t), past=occ.filter(o=>o.end<t).reverse();
+    if(!occ.length) return `<div class="empty" style="padding-top:30px"><b>${esc(kfLabel())} 일정이 없어요</b>앞뒤 1년 안에 이 종류로 저장된 일정이 없어요.</div>`;
+    return `<div class="rescount">${esc(kfLabel())} · 일정 <b>${occ.length}</b>개 · 앞뒤 1년</div>${section('다가오는 일정',up,false)}${section('지난 일정',past,false)}`;
+  }
+  const evs=S.events.filter(e=>matchKind(e)&&[e.title,e.place,e.memo].some(v=>norm(v).includes(q)));
   let occ=[];
   for(const ev of evs){ if(ev.repeat==='none') occ.push(...occursIn(ev,ev.start,ev.start)); else occ.push(...occursIn(ev,addDays(t,-366),addDays(t,366))) }
   occ.sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:(a.ev.time||'').localeCompare(b.ev.time||''));
   const up=occ.filter(o=>o.end>=t), past=occ.filter(o=>o.end<t).reverse();
-  const notes=Object.entries(S.notes).filter(([d,v])=>norm(v).includes(q)).sort((a,b)=>a[0]<b[0]?1:-1);
-  if(!occ.length&&!notes.length) return `<div class="empty" style="padding-top:30px"><b>"${esc(Q.trim())}" 결과가 없어요</b>제목, 장소, 메모, 한 줄 기록에서 찾아요. 띄어쓰기는 무시해요.</div>`;
+  const notes=KF?[]:Object.entries(S.notes).filter(([d,v])=>norm(v).includes(q)).sort((a,b)=>a[0]<b[0]?1:-1);
+  if(!occ.length&&!notes.length) return `<div class="empty" style="padding-top:30px"><b>"${esc(Q.trim())}" 결과가 없어요</b>${KF?`${esc(kfLabel())} 종류 안에서 찾았어요. 전체로 바꾸면 더 나올 수 있어요.`:'제목, 장소, 메모, 한 줄 기록에서 찾아요. 띄어쓰기는 무시해요.'}</div>`;
   const noteHtml=notes.length?`<div class="eyebrow">한 줄 기록</div><div class="list">${notes.map(([d,v])=>`<button type="button" class="noteline" data-act="note" data-date="${d}">${I.pen}<span class="tx">${hl(v,q)}</span><span class="tag">${esc(kshort(d))}</span></button>`).join('')}</div>`:'';
-  return `<div class="rescount">일정 <b>${evs.length}</b>개 · 기록 <b>${notes.length}</b>개${evs.some(e=>e.repeat!=='none')?' · 반복 일정은 앞뒤 1년치만 보여요':''}</div>${section('다가오는 일정',up,false)}${section('지난 일정',past,false)}${noteHtml}`;
+  return `<div class="rescount">${KF?esc(kfLabel())+' · ':''}일정 <b>${evs.length}</b>개${KF?'':` · 기록 <b>${notes.length}</b>개`}${evs.some(e=>e.repeat!=='none')?' · 반복 일정은 앞뒤 1년치만 보여요':''}</div>${section('다가오는 일정',up,false)}${section('지난 일정',past,false)}${noteHtml}`;
+}
+function kindChips(){
+  const chip=(v,label)=>`<button type="button" class="fchip ${KF===v?'on':''}" data-kf="${esc(v)}">${label}</button>`;
+  return chip('','전체')+S.settings.kinds.map(k=>chip(k.id,`<em>${esc(k.icon)}</em>${esc(k.name)}`)).join('')+chip('none','일반');
 }
 function searchSheet(){
-  const body=`<div class="search">${I.search}<input type="search" id="q" placeholder="제목·장소·메모·한 줄 기록 검색" value="${esc(Q)}" autocomplete="off" enterkeyhint="search" aria-label="검색"><button type="button" class="clr" id="qClr" aria-label="검색어 지우기"${Q?'':' hidden'}>${I.x}</button></div><div id="listBody">${searchBody()}</div>`;
+  KF='';
+  const body=`<div class="search">${I.search}<input type="search" id="q" placeholder="제목·장소·메모·한 줄 기록 검색" value="${esc(Q)}" autocomplete="off" enterkeyhint="search" aria-label="검색"><button type="button" class="clr" id="qClr" aria-label="검색어 지우기"${Q?'':' hidden'}>${I.x}</button></div><div class="fchips" id="kf">${kindChips()}</div><div id="listBody">${searchBody()}</div>`;
   const form=openSheet('검색',body,{submitLabel:'닫기',onSubmit:()=>closeSheet(),tall:true});
+  form.querySelector('#kf').addEventListener('click',e=>{ const b=e.target.closest('[data-kf]'); if(!b) return; KF=b.dataset.kf; form.querySelectorAll('[data-kf]').forEach(x=>x.classList.toggle('on',x.dataset.kf===KF)); form.querySelector('#listBody').innerHTML=searchBody() });
   form.querySelector('.sheet-f .btn.primary').classList.replace('primary','ghost');
   setTimeout(()=>{ try{ form.querySelector('#q').focus() }catch(e){} },80);
 }
@@ -702,15 +726,14 @@ function field(label,inner,hint){ return `<div class="field"><label class="k">${
 /* 일정 추가/수정 */
 function editSheet(ev,{isNew=false}={}){
   let allDay=!!ev.allDay;
-  const colors=COLORS.map(([k,n])=>`<option value="${k}"${ev.color===k?' selected':''}>${n}</option>`).join('');
+  const colors=COLORS.map(([k,n])=>`<label class="dot c-${k}" title="${n}"><input type="radio" name="color" value="${k}"${ev.color===k?' checked':''} aria-label="${n}"><i></i></label>`).join('');
+  const colorName=k=>(COLORS.find(c=>c[0]===k)||COLORS[0])[1];
   const kinds=[`<option value=""${!kindOf(ev.kind)?' selected':''}>일반 (아이콘 없음)</option>`,...S.settings.kinds.map(k=>`<option value="${esc(k.id)}"${ev.kind===k.id?' selected':''}>${esc(k.icon)} ${esc(k.name)}</option>`)].join('');
   const reps=REPEATS.map(([k,n])=>`<option value="${k}"${ev.repeat===k?' selected':''}>${n}</option>`).join('');
   const body=`
     ${field('제목',`<input class="input" name="title" maxlength="60" placeholder="예: 치과 예약" value="${esc(ev.title)}" autocomplete="off" enterkeyhint="done">`)}
-    <div class="two">
-      ${field('종류',`<select class="input" name="kind">${kinds}</select>`)}
-      ${field('색',`<div class="selwrap c-${ev.color}" id="colorWrap"><i class="sw"></i><select class="input" name="color">${colors}</select></div>`)}
-    </div>
+    ${field('종류',`<select class="input" name="kind">${kinds}</select>`)}
+    <div class="field"><span class="k">색<b id="colorName">${esc(colorName(ev.color))}</b></span><div class="dots">${colors}</div></div>
     <div class="hint" style="margin-top:6px;font-size:12px;color:var(--muted)">종류가 일반이 아니면 달력의 날짜 숫자 자리에 아이콘이 보여요. 종류 목록과 순서는 설정에서 바꿀 수 있어요.</div>
     <div class="field"><span class="k">시간</span><div class="seg" id="seg"><button type="button" class="${allDay?'on':''}" data-allday="1">하루 종일</button><button type="button" class="${allDay?'':'on'}" data-allday="0">시간 지정</button></div></div>
     <div class="two">
@@ -738,14 +761,14 @@ function editSheet(ev,{isNew=false}={}){
       const time=allDay?'':f.time.value, endTime=allDay?'':f.endTime.value;
       if(!allDay&&!isTime(time)) return toast('시작 시간을 넣거나 "하루 종일"을 선택해 주세요');
       if(endTime&&!end&&endTime<time) return toast('끝나는 시간이 시작 시간보다 빨라요');
-      const color=COLORS.some(c=>c[0]===f.color.value)?f.color.value:'green';
+      const color=(f.querySelector('input[name=color]:checked')||{}).value||'green';
       const kind=f.kind.value||'';
       const data={id:ev.id,title,start,end,allDay,time,endTime,color,kind,place:f.place.value.trim(),memo:f.memo.value.trim(),repeat:f.repeat.value,sample:false};
       if(isNew) S.events.push(data); else { const i=S.events.findIndex(x=>x.id===ev.id); if(i>=0) S.events[i]=data; else S.events.push(data) }
       save(); closeSheet(); V.month=start.slice(0,7); V.sel=start; V.week=mondayOf(start); saveView(); render(); toast(isNew?'일정을 추가했어요':'수정했어요');
     }
   });
-  const cw=form.querySelector('#colorWrap'); form.color.addEventListener('change',()=>{ cw.className='selwrap c-'+form.color.value });
+  form.querySelector('.dots').addEventListener('change',e=>{ if(e.target.name==='color') form.querySelector('#colorName').textContent=colorName(e.target.value) });
   const seg=form.querySelector('#seg'), timeRow=form.querySelector('#timeRow');
   seg.addEventListener('click',e=>{ const b=e.target.closest('[data-allday]'); if(!b) return; allDay=b.dataset.allday==='1'; seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); timeRow.hidden=allDay; if(!allDay&&!form.time.value) form.time.focus() });
   form.start.addEventListener('change',()=>{ form.end.min=form.start.value; if(form.end.value&&form.end.value<form.start.value) form.end.value='' });
