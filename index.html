@@ -201,6 +201,31 @@ mark{background:transparent;color:var(--accent);font-weight:700}
 .wkrow .note.empty{color:var(--muted)}
 .wkrow .note.empty::before{content:"＋ ";opacity:.7}
 
+/* 일간 */
+.qcard{margin:12px 16px 0;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;position:relative}
+.qcard .eyebrow{margin:0 0 8px}
+.qcard .q{margin:0;font-size:19px;font-weight:600;line-height:1.45;letter-spacing:-.01em;text-wrap:balance;padding-right:36px;white-space:pre-line}
+.qcard .q.none{color:var(--muted);font-weight:500;font-size:16px}
+.qcard .qedit{position:absolute;right:10px;top:10px}
+.qcard .qmeta{margin-top:10px;font-size:12.5px;color:var(--muted);font-weight:500}
+.arow{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:start;width:100%;text-align:left;padding:12px 14px;border-top:1px solid var(--line);color:var(--ink)}
+.arow:first-child{border-top:0}
+.arow:hover{background:var(--surface2)}
+.arow .ay{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);padding-top:2px}
+.arow .ay small{display:block;font-size:11px;color:var(--muted);font-weight:500;font-family:var(--sans)}
+.arow .at{font-size:14.5px;line-height:1.55;white-space:pre-line;overflow-wrap:anywhere;min-width:0}
+.arow.cur{background:var(--accent-soft)}
+.arow.cur:hover{background:var(--accent-soft)}
+.dpick{display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px;margin-top:10px}
+.dpick .dow{font-size:11.5px;color:var(--muted);font-weight:600;text-align:center;padding:4px 0}
+.dpick button{position:relative;height:40px;border-radius:10px;font-family:var(--mono);font-size:14px;color:var(--ink)}
+.dpick button.out{opacity:.3}
+.dpick button.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.dpick button.cur{box-shadow:inset 0 0 0 2px var(--accent)}
+.dpick button.has::after{content:"";position:absolute;left:50%;bottom:4px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--accent)}
+.dpick button.on.has::after{background:var(--accent-ink)}
+.qimport{margin-top:8px}
+
 /* 검색 */
 .search{display:flex;align-items:center;gap:8px;margin:6px 0 0;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:0 10px 0 12px;min-height:46px}
 .search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -297,12 +322,19 @@ select.input{background-image:linear-gradient(45deg,transparent 50%,var(--muted)
 .wgrid button.cur{box-shadow:inset 0 0 0 2px var(--accent)}
 
 /* 탭바 + 추가 버튼 */
-.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:6}
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:6}
 .tabbar button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:11.5px;font-weight:600;color:var(--muted)}
 .tabbar button.on{color:var(--accent)}
 .tabbar svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .fab{position:fixed;right:max(16px,calc(50% - 240px + 16px));bottom:calc(76px + env(safe-area-inset-bottom));z-index:7;width:56px;height:56px;border-radius:18px;background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow);display:grid;place-items:center}
 .fab svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+
+/* 스와이프 넘김 */
+@keyframes slideL{from{transform:translateX(28px);opacity:.35}to{transform:none;opacity:1}}
+@keyframes slideR{from{transform:translateX(-28px);opacity:.35}to{transform:none;opacity:1}}
+.swipe-next{animation:slideL .22s ease-out}
+.swipe-prev{animation:slideR .22s ease-out}
+@media (prefers-reduced-motion:reduce){.swipe-next,.swipe-prev{animation:none}}
 
 /* 토스트 */
 #toastRoot{position:fixed;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom));display:flex;justify-content:center;pointer-events:none;z-index:40}
@@ -336,8 +368,378 @@ const KEY='sched-cal.v1';
 const COLORS=[['green','숲'],['teal','민트'],['blue','바다'],['sky','하늘'],['purple','포도'],['lavender','라벤더'],['rose','장미'],['coral','산호'],['orange','살구'],['yellow','노랑'],['brown','갈색'],['gray','잿빛']];
 const REPEATS=[['none','반복 없음'],['weekly','매주'],['monthly','매월'],['yearly','매년']];
 const DEF_KINDS=()=>[{id:'birthday',icon:'🎂',name:'생일'},{id:'anniv',icon:'💐',name:'기념일'},{id:'travel',icon:'✈️',name:'여행'},{id:'meet',icon:'🍽️',name:'약속'},{id:'hospital',icon:'🏥',name:'병원'},{id:'vacation',icon:'🏖️',name:'휴가'}];
-const NOTE_MAX=140;
-const DEF=()=>({version:2,events:[],notes:{},sampleNotes:[],settings:{theme:'system',weekStart:0,holidays:true,kinds:DEF_KINDS()}});
+const NOTE_MAX=140, ANS_MAX=1000, Q_MAX=200;
+// 기본 질문 366개 (1월 1일부터). 2월 29일은 2월 28일 질문을 같이 쓴다. 사용자가 고친 질문은 settings.questions에 저장된다
+const DEF_QUESTIONS={
+"01-01":"올해를 시작하면서 가장 기대되는 일은?",
+"01-02":"올해를 한 단어로 미리 정한다면?",
+"01-03":"올해 꼭 사고 싶은 것 하나는?",
+"01-04":"올해 가고 싶은 여행지는?",
+"01-05":"올해 더 자주 만나고 싶은 사람은?",
+"01-06":"올해 처음으로 해보고 싶은 것 하나는?",
+"01-07":"올해 꼭 보고 싶은 풍경은? (벚꽃, 눈, 바다 일몰…)",
+"01-08":"올해 목표로 하는 책 권수는?",
+"01-09":"올해 꼭 먹어보고 싶은 것은?",
+"01-10":"올해 목표로 하는 여행 횟수는?",
+"01-11":"올해 새로 배우고 싶은 것은?",
+"01-12":"올해 꼭 지키고 싶은 하루 루틴 하나는?",
+"01-13":"올해 그만두고 싶은 것 하나는?",
+"01-14":"올해 목표로 하는 하루 걸음 수는?",
+"01-15":"올해 가장 기다려지는 계절이나 시기는?",
+"01-16":"올해 더 자주 하고 싶은 작은 즐거움은?",
+"01-17":"올해 나에게 꼭 선물하고 싶은 경험은?",
+"01-18":"올해 생일을 어떻게 보내고 싶은가?",
+"01-19":"올해 내 몸을 위해 하고 싶은 것 하나는?",
+"01-20":"올해 돈을 가장 아끼고 싶은 영역은?",
+"01-21":"올해 꼭 가보고 싶은 전시나 공연은?",
+"01-22":"올해 목표로 하는 운동 횟수는? (주 몇 회)",
+"01-23":"올해 가장 자주 느끼고 싶은 기분은?",
+"01-24":"올해 목표로 하는 저축 금액은?",
+"01-25":"올해 나 자신과 꼭 지키고 싶은 작은 약속 하나는?",
+"01-26":"올해 안에 결정하고 싶은 것은?",
+"01-27":"올해 처음으로 혼자 해보고 싶은 것은?",
+"01-28":"올해 가족과 꼭 하고 싶은 것은?",
+"01-29":"올해 실제로 해보고 싶은 작은 모험은?",
+"01-30":"올해 꼭 보내고 싶은 완벽한 하루를 그려본다면?",
+"01-31":"1년 뒤 오늘, 무엇이 달라져 있으면 좋겠는가?",
+"02-01":"요즘 아침 식사는 하는가? 주로 무엇을?",
+"02-02":"올해 쉬려고 미리 비워둔 날이 있는가? 언제?",
+"02-03":"최근에 누군가와 함께한 시간 중 가장 길었던 것은? 무엇을 했나?",
+"02-04":"올해 가장 기다리는 출시(영화, 음악, 게임, 제품)는?",
+"02-05":"최근에 충동구매한 것은?",
+"02-06":"요즘 가장 좋아하는 공원이나 자연 공간은?",
+"02-07":"나이를 하루만 바꿀 수 있다면 몇 살로? 무엇을 할까?",
+"02-08":"오늘 가장 맛있었던 것은?",
+"02-09":"최근에 서운했던 순간은? 말했나, 삼켰나?",
+"02-10":"올해 선물하고 싶은 사람과 그 선물은?",
+"02-11":"최근에 끊은 콘텐츠나 취미는? 왜?",
+"02-12":"요즘 가장 솔직해지는 순간은 언제인가?",
+"02-13":"장바구니에 담아두고 안 산 것은?",
+"02-14":"과거의 나에게 문자 한 통을 보낼 수 있다면 몇 년 전, 무슨 내용?",
+"02-15":"오늘 아침에 눈 뜨고 처음 든 생각은?",
+"02-16":"요즘 하루 중 가장 서두르는 시간은?",
+"02-17":"요즘 가장 만나고 싶은데 못 만나는 사람은?",
+"02-18":"최근에 혼자 간 곳은?",
+"02-19":"요즘 가장 자주 느끼는 감정은?",
+"02-20":"습관처럼 확인하는 것은? (날씨, 주식, 뉴스, SNS…)",
+"02-21":"올해 누군가에게 꼭 해주고 싶은 것은? (물건이 아니어도)",
+"02-22":"최근에 시간 가는 줄 모르고 했던 것은?",
+"02-23":"가장 최근에 받은 칭찬은?",
+"02-24":"이번 달 가장 큰 지출은?",
+"02-25":"오늘 가장 조용했던 시간은?",
+"02-26":"최근에 쉬려고 했는데 쉬지 못한 이유는?",
+"02-27":"휴대폰 없이 일주일을 산다면 가장 힘든 것은?",
+"02-28":"이번 달 가장 기억에 남는 일은?",
+"02-29":"이번 달 가장 기억에 남는 일은?",
+"03-01":"올해 함께 여행 가고 싶은 사람은?",
+"03-02":"지금 사는 동네의 가장 좋은 점과 아쉬운 점은?",
+"03-03":"최근에 '다행이다' 하고 느낀 일은?",
+"03-04":"요즘 가장 좋아하는 간식은?",
+"03-05":"요즘 가장 좋아하는 계절 활동은?",
+"03-06":"최근에 모르는 사람에게 받은 친절은?",
+"03-07":"올해 들어 새로 생긴 주말 습관은?",
+"03-08":"올해 꼭 가보고 싶은 쉼의 장소는? (온천, 바다, 시골, 호텔…)",
+"03-09":"1년 전에는 없었던 소비 항목은?",
+"03-10":"오늘 가장 오래 머문 장소는?",
+"03-11":"최근에 뿌듯했던 작은 일은?",
+"03-12":"하루 동안 비서가 생긴다면 무엇을 맡길까?",
+"03-13":"최근에 누군가에게 소개해준 것(가게, 콘텐츠, 사람)은?",
+"03-14":"요즘 가장 자주 가는 장소 세 곳은?",
+"03-15":"오늘 처음 웃은 순간은 언제였나?",
+"03-16":"최근에 쉬는 중에 떠오른 좋은 생각이나 아이디어는?",
+"03-17":"오늘 가장 많이 걸은 구간은?",
+"03-18":"요즘 남들보다 돈을 더 쓰는 것 같은 영역은?",
+"03-19":"최근에 '이거 너 생각나서' 하고 건넨 것은?",
+"03-20":"최근에 마음이 무거웠던 날은? 이유는?",
+"03-21":"요즘 아침에 일어나서 가장 먼저 하는 일은?",
+"03-22":"최근에 간 곳 중 다시 가고 싶은 곳은?",
+"03-23":"최근에 한 거짓말 중 가장 큰 것은?",
+"03-24":"내일 하루가 완전히 비어 있다면 무엇을 할까?",
+"03-25":"이번 달에 고맙다고 말한 사람은?",
+"03-26":"요즘 수집하거나 모으는 것은?",
+"03-27":"최근 가장 늦게까지 잔 날은?",
+"03-28":"오늘 하늘을 봤나? 어땠나?",
+"03-29":"최근에 가격을 보고 놀란 것은?",
+"03-30":"최근에 '괜찮아졌다'고 느낀 것은?",
+"03-31":"이번 달 가장 기억에 남는 일은?",
+"04-01":"요즘 누군가에게 가장 자주 나누는 것은? (음식, 정보, 시간, 돈…)",
+"04-02":"요즘 평균 취침 시간과 기상 시간은?",
+"04-03":"최근에 다른 사람에게 추천받아 본 것은? 어땠나?",
+"04-04":"최근에 간 곳 중 예상과 가장 달랐던 곳은?",
+"04-05":"어디든 한 달 살 수 있다면 어디로 갈까?",
+"04-06":"이번 주에 가장 많이 대화한 사람 세 명은?",
+"04-07":"바쁜 날 짧게 쉬는 나만의 방법은?",
+"04-08":"요즘 몸을 움직이는 루틴은?",
+"04-09":"요즘 현금을 마지막으로 쓴 날은?",
+"04-10":"최근에 설렜던 일은?",
+"04-11":"오늘 날씨는? 그 날씨가 하루에 영향을 줬나?",
+"04-12":"요즘 나에게 가장 많이 베푸는 사람은?",
+"04-13":"최근에 처음 알게 된 가수나 음악은?",
+"04-14":"요즘 가장 많이 검색하는 것은?",
+"04-15":"지금 하는 걱정 하나를 돈으로 해결할 수 있다면 얼마까지 낼까?",
+"04-16":"요즘 가장 좋아하는 바깥 풍경은?",
+"04-17":"최근에 가장 잘 쉬었던 날은? 무엇을 했나?",
+"04-18":"오늘 가장 많이 쓴 단어나 말은?",
+"04-19":"요즘 새로 가까워진 사람은?",
+"04-20":"최근에 산 것 중 가장 쓸모없었던 것은?",
+"04-21":"지금 나에게 가장 필요한 것 한 가지는?",
+"04-22":"매주 반복하는 약속이나 일정은?",
+"04-23":"요즘 가장 빠져 있는 것은?",
+"04-24":"아무도 모르는 나의 작은 두려움은?",
+"04-25":"최근에 받은 선물 중 가장 좋았던 것은?",
+"04-26":"지금 100만 원이 생기면 무엇에 쓸까?",
+"04-27":"최근에 누군가를 데려가고 싶었던 장소는?",
+"04-28":"오늘 누군가에게 고마웠던 일은?",
+"04-29":"지금 더 쉬어야 하는 것은 몸인가, 머리인가?",
+"04-30":"이번 달 가장 기억에 남는 일은?",
+"05-01":"비상금이 있다면 몇 달치 생활비인가?",
+"05-02":"요즘 가장 자주 만나는 사람은? 왜 그 사람인가?",
+"05-03":"최근에 짜증 났던 사소한 일은?",
+"05-04":"요즘 \"그거 봤어?\" 하고 가장 많이 묻는 것은?",
+"05-05":"커피나 차는 하루에 몇 잔, 언제 마시는가?",
+"05-06":"평생 한 계절만 살아야 한다면?",
+"05-07":"가장 최근에 낮잠을 잔 날은?",
+"05-08":"오늘 가장 오래 들고 있던 물건은?",
+"05-09":"요즘 내가 가장 잘 챙기는 사람은? 어떻게 챙기는가?",
+"05-10":"약속 장소로 가장 자주 쓰는 동네는?",
+"05-11":"매달 나가는 구독 서비스는? 전부 쓰고 있는가?",
+"05-12":"지금 나 자신에게 점수를 준다면? 이유는?",
+"05-13":"요즘 나에게 가장 많이 연락하는 사람은? 나는 누구에게 가장 많이 연락하는가?",
+"05-14":"최근에 다시 보거나 다시 들은 것은? 왜?",
+"05-15":"최근에 일하다 가장 뿌듯했던 순간은?",
+"05-16":"요즘 가장 자주 멍 때리는 장소나 상황은?",
+"05-17":"내 하루에서 한 가지 일을 영원히 없앨 수 있다면?",
+"05-18":"오늘 가장 기분 좋았던 순간은 몇 시쯤이었나?",
+"05-19":"요즘 가장 자주 돈을 쓰는 카테고리는?",
+"05-20":"이번 달에 누군가와 처음 함께 해본 것은?",
+"05-21":"요즘 가장 자주 하는 혼잣말은?",
+"05-22":"최근에 간 곳 중 가장 실망한 곳은?",
+"05-23":"요즘 나도 모르게 반복하는 말이나 행동은?",
+"05-24":"재미를 위해 가장 자주 쓰는 앱은?",
+"05-25":"지금 가장 받고 싶은 선물은?",
+"05-26":"요즘 아무에게도 말하지 않은 것은?",
+"05-27":"오늘 가장 피곤했던 순간은?",
+"05-28":"가장 많이 쓰는 카드(또는 결제 수단)는?",
+"05-29":"쉬면서 하는 것 중 사실은 쉬는 게 아닌 것은?",
+"05-30":"세 가지 음식만 먹고 살아야 한다면?",
+"05-31":"이번 달 가장 기억에 남는 일은?",
+"06-01":"올해 처음 가본 곳은?",
+"06-02":"최근 한 달 사이 새로 알게 된 사람은?",
+"06-03":"스트레스를 풀기 위해 하는 것은?",
+"06-04":"가장 많이 쓰는 SNS는? 하루에 얼마나?",
+"06-05":"혼자 있을 때 반복하는 행동은?",
+"06-06":"요즘 부끄럽지 않게 자랑할 수 있는 것은?",
+"06-07":"올해 생일에 받고 싶은 것은?",
+"06-08":"오늘 들은 말 중 기억에 남는 것은?",
+"06-09":"최근에 '이게 쉬는 거구나' 하고 느낀 순간은?",
+"06-10":"돈 때문에 미루고 있는 것은?",
+"06-11":"최근에 처음 가본 전시, 공연, 행사는?",
+"06-12":"세상에서 한 가지를 없앨 수 있다면?",
+"06-13":"최근에 걱정했는데 아무 일도 없었던 것은?",
+"06-14":"요즘 가족과 주로 어떤 이야기를 하는가?",
+"06-15":"최근에 다른 사람 추천으로 간 곳은? 어땠나?",
+"06-16":"오늘 가장 잘한 선택은? (작은 것이라도)",
+"06-17":"쉬고 난 뒤 '제대로 쉬었다'고 느끼는 기준은?",
+"06-18":"요즘 나는 주는 편인가, 받는 편인가?",
+"06-19":"내 습관 중 남들에게 추천할 수 있는 것은?",
+"06-20":"최근에 돈을 쓰고 가장 행복했던 순간은?",
+"06-21":"최근에 '이걸 왜 이제 알았지' 했던 것은?",
+"06-22":"지루할 때 무엇을 하는가?",
+"06-23":"올해 남은 날 중 하루를 공휴일로 만들 수 있다면 언제, 왜?",
+"06-24":"1년 뒤 생일의 나는 어디서 누구와 있을까?",
+"06-25":"최근에 간 곳 중 가장 북적였던 곳은?",
+"06-26":"최근에 누군가에게 받은 가장 좋은 조언은?",
+"06-27":"오늘 처음 한 일은?",
+"06-28":"쉬는 날 하루가 끝날 때 보통 어떤 기분인가?",
+"06-29":"요즘 돈을 쓸 때 가장 많이 보는 기준은? (가격, 디자인, 후기, 편의…)",
+"06-30":"이번 달 가장 기억에 남는 일은?",
+"07-01":"지금 읽고 있는 책은? 몇 쪽까지 읽었나?",
+"07-02":"최근에 몰래 한 일은?",
+"07-03":"습관처럼 하다가 최근에 '이걸 왜 하지?' 싶었던 것은?",
+"07-04":"최근에 밥을 사준 적은? 얻어먹은 적은?",
+"07-05":"최근에 화가 났던 일은? 지금도 화가 나는가?",
+"07-06":"요즘 가장 자주 하는 요리는?",
+"07-07":"다른 시대로 하루 여행할 수 있다면 언제로?",
+"07-08":"최근에 길을 잃거나 헤맨 적이 있는가?",
+"07-09":"최근에 혼자 보낸 시간 중 가장 좋았던 것은?",
+"07-10":"요즘 가장 솔직하게 이야기할 수 있는 사람은?",
+"07-11":"오늘 먹은 끼니를 전부 적어본다면?",
+"07-12":"최근 주말 중 가장 잘 놀았던 날은? 무엇을 했나?",
+"07-13":"한 달 교통비는?",
+"07-14":"이번 주에 가장 기분 좋았던 순간은?",
+"07-15":"최근에 누군가 덕분에 하루가 좋아졌던 일은?",
+"07-16":"최근에 시도했다가 실패한 습관은?",
+"07-17":"요즘 잠은 잘 자는가? 가장 잘 잔 날은?",
+"07-18":"이사 가고 싶은 동네가 있다면?",
+"07-19":"하루 동안 돈이 전혀 들지 않는다면 무엇을 할까?",
+"07-20":"오늘 잠들기 전 가장 마지막으로 떠오른 사람은?",
+"07-21":"요즘 연락이 뜸해졌지만 신경 쓰이는 사람은?",
+"07-22":"최근에 '이건 내 취향이다' 하고 발견한 것은?",
+"07-23":"요즘 가장 편안한 순간은 언제인가?",
+"07-24":"최근에 산 것 중 가장 만족스러운 것은?",
+"07-25":"요즘 선물보다 더 받고 싶은 것은?",
+"07-26":"요즘 나를 가장 잘 설명하는 이모지 세 개는?",
+"07-27":"오늘 가장 오래 이야기한 사람은? 무슨 이야기?",
+"07-28":"요즘 가장 좋아하는 산책 경로는?",
+"07-29":"쉴 때 죄책감이 드는가? 어떤 상황에서?",
+"07-30":"한 사람의 속마음을 하루만 읽을 수 있다면 누구의?",
+"07-31":"이번 달 가장 기억에 남는 일은?",
+"08-01":"요즘 가장 기다리는 다음 회차(드라마, 웹툰, 경기)는?",
+"08-02":"최근에 누군가 때문에 짜증 났던 일은? 지금은 어떻게 느껴지는가?",
+"08-03":"지금 지출 중 가장 먼저 줄일 수 있는 것은?",
+"08-04":"주말 아침 루틴은 평일과 어떻게 다른가?",
+"08-05":"최근에 '잘했다'고 스스로를 칭찬한 일은?",
+"08-06":"최근에 누군가에게 시간을 내준 일은?",
+"08-07":"오늘 가장 많이 본 것은? (화면, 사람, 하늘…)",
+"08-08":"올해 다녀온 휴가는? 남은 휴가 계획은?",
+"08-09":"최근에 본 영화나 드라마 중 가장 좋았던 것은?",
+"08-10":"최근에 간 여행지는? 가장 좋았던 순간은?",
+"08-11":"요즘 속으로만 하는 불평은?",
+"08-12":"1년 휴가가 주어진다면 무엇을 할까?",
+"08-13":"최근에 공짜로 얻은 것 중 좋았던 것은?",
+"08-14":"최근 가장 길게 통화한 사람은? 몇 분이었나?",
+"08-15":"요즘 잠들기 전 루틴은?",
+"08-16":"요즘 느끼는 피로는 몸인가, 마음인가?",
+"08-17":"최근에 돈 내고 본 콘텐츠나 공연은? 그만한 가치가 있었나?",
+"08-18":"오늘 산 것은? 얼마였나?",
+"08-19":"쉬고 싶을 때 가장 먼저 떠오르는 곳은?",
+"08-20":"최근에 간 곳 중 사진을 가장 많이 찍은 곳은?",
+"08-21":"요즘 함께 있으면 시간이 빨리 가는 사람은?",
+"08-22":"최근에 가장 비싸게 먹은 한 끼는?",
+"08-23":"내 일터에 규칙 하나를 만들 수 있다면?",
+"08-24":"최근에 혼자 웃었던 일은?",
+"08-25":"오늘 처음 보는 사람과 나눈 대화가 있었나?",
+"08-26":"최근에 기부하거나 후원한 것은?",
+"08-27":"최근에 '쉬어야겠다'고 느낀 신호는?",
+"08-28":"자주 보는 웹툰이나 연재물은?",
+"08-29":"매일 빠짐없이 하는 것 세 가지는?",
+"08-30":"올해 여행이나 큰 경험에 쓴(또는 쓸) 돈은?",
+"08-31":"이번 달 가장 기억에 남는 일은?",
+"09-01":"최근에 속으로 울었거나 울고 싶었던 순간은?",
+"09-02":"아무도 모르게 하루를 보낼 수 있다면 무엇을 할까?",
+"09-03":"지금 메신저 상단에 있는 대화방 다섯 개는?",
+"09-04":"요즘 자주 지나가는 길에서 새로 눈에 들어온 것은?",
+"09-05":"최근에 이유 없이 기분이 좋았던 날은?",
+"09-06":"오늘 가장 웃긴 일은?",
+"09-07":"최근에 낯선 사람에게 베푼 작은 친절은?",
+"09-08":"요즘 하루 중 아무도 나를 찾지 않는 시간은 언제인가?",
+"09-09":"요즘 좋아하게 된 것 중 예전엔 관심 없던 것은?",
+"09-10":"최근에 며칠 이상 연속으로 지킨 것은? 며칠째인가?",
+"09-11":"돈을 쓰면서 죄책감이 드는 것은?",
+"09-12":"요즘 가장 듣고 싶은 말은?",
+"09-13":"요즘 하루 평균 걸음 수는?",
+"09-14":"최근에 받은 메시지 중 기억에 남는 것은?",
+"09-15":"지금 가장 기다리는 것은?",
+"09-16":"미래의 나에게 한 가지 질문을 할 수 있다면?",
+"09-17":"요즘 가장 좋아하는 '앉아 있는 자리'는? (카페, 벤치, 창가…)",
+"09-18":"최근에 누군가와 같은 콘텐츠를 보고 이야기한 것은?",
+"09-19":"오늘 미룬 일은?",
+"09-20":"요즘 가장 잘 쉰다고 느끼는 방법은?",
+"09-21":"최근에 누군가에게 만들어준 것은? (음식, 물건, 플레이리스트…)",
+"09-22":"저축이나 투자는 어떻게 하고 있는가?",
+"09-23":"요즘 기분이 가장 자주 바뀌는 상황은?",
+"09-24":"요즘 가장 자주 먹는 점심 메뉴는?",
+"09-25":"최근에 우연히 발견한 좋은 장소는?",
+"09-26":"지금 당장 누군가와 하루 자리를 바꿀 수 있다면 누구와?",
+"09-27":"일주일에 나를 위한 시간은 몇 시간쯤인가?",
+"09-28":"요즘 '그 사람 잘 지내나' 하고 떠오르는 사람은?",
+"09-29":"요즘 가장 좋아하는 게임(또는 놀이)은?",
+"09-30":"이번 달 가장 기억에 남는 일은?",
+"10-01":"오늘 들은 노래나 소리 중 기억나는 것은?",
+"10-02":"최근에 누군가를 기쁘게 하려고 한 일은? 성공했나?",
+"10-03":"올해 소비 중 가장 '나답다'고 느낀 것은?",
+"10-04":"미루는 것이 습관이 된 일은?",
+"10-05":"최근에 감동받은 일은?",
+"10-06":"올해 가장 멀리 간 곳은?",
+"10-07":"요즘 가장 좋아하는 '함께 노는' 방법은?",
+"10-08":"쉴 때 함께 있고 싶은 사람은? 아니면 혼자?",
+"10-09":"하루만 다른 사람으로 살 수 있다면 누구로?",
+"10-10":"오늘 연락한 사람 중 가장 의외의 사람은?",
+"10-11":"요즘 가족에게 들은 말 중 기억에 남는 것은?",
+"10-12":"아무도 모르게 지키고 있는 작은 규칙은?",
+"10-13":"요즘 돈을 가장 아끼는 영역은?",
+"10-14":"쉬는 날에도 꼭 하는 것은?",
+"10-15":"요즘 가장 자주 미안함을 느끼는 대상은?",
+"10-16":"누군가를 위해 쓴 돈 중 최근 가장 기분 좋았던 것은?",
+"10-17":"최근에 새로 생긴 취미나 관심사는?",
+"10-18":"아무것도 안 하는 시간이 하루에 얼마나 있나?",
+"10-19":"오늘 가장 오래 기다린 것은?",
+"10-20":"지금 직업을 바꿔야 한다면 무엇을 선택할까?",
+"10-21":"올해 가장 많이 걸어 다닌 날은? 어디였나?",
+"10-22":"최근에 부탁한 일과 부탁받은 일은?",
+"10-23":"올해 돈과 관련해 가장 잘한 결정은?",
+"10-24":"나를 가장 빨리 기분 좋게 하는 것은?",
+"10-25":"집에 들어오면 가장 먼저 하는 행동은?",
+"10-26":"최근에 가장 많이 웃은 콘텐츠는?",
+"10-27":"최근에 휴대폰을 가장 오래 안 본 시간은?",
+"10-28":"오늘 짜증 났던 순간과 그 이유는?",
+"10-29":"최근에 받은 도움 중 꼭 갚고 싶은 것은?",
+"10-30":"최근에 간 곳 중 가장 멋있다고 느낀 건물이나 공간은?",
+"10-31":"이번 달 가장 기억에 남는 일은?",
+"11-01":"올해 한 가지를 되돌릴 수 있다면?",
+"11-02":"요즘 시간을 가장 많이 쓰는 것은? 만족하는가?",
+"11-03":"요즘 나를 가장 많이 웃게 하는 사람은?",
+"11-04":"최근에 환불이나 취소한 것은?",
+"11-05":"지금 가장 그리운 것은?",
+"11-06":"오늘 하루를 사진 한 장으로 남긴다면 어떤 장면?",
+"11-07":"지금 가장 좋아하는 연예인이나 유명인은? 작년과 같은가?",
+"11-08":"올해 남은 기간 꼭 쉬고 싶은 날은 언제인가?",
+"11-09":"최근에 누군가가 나를 위해 해준 작은 일은?",
+"11-10":"일주일에 한 번 하는 것은?",
+"11-11":"단골이라고 부를 수 있는 곳은? 몇 년째인가?",
+"11-12":"지금 1억 원이 생기면?",
+"11-13":"아무도 모르는 나의 작은 자부심은?",
+"11-14":"요즘 가장 자주 결제하는 가게나 앱은?",
+"11-15":"요즘 가장 부러운 사람은? 무엇 때문에?",
+"11-16":"올해 가장 재미있었던 경험은?",
+"11-17":"오늘 입은 옷은? 왜 그 옷이었나?",
+"11-18":"요즘 기분을 날씨로 표현하면?",
+"11-19":"최근에 받은 가장 뜻밖의 선물은?",
+"11-20":"최근에 쉬는 걸 포기하고 한 일은? 그럴 가치가 있었나?",
+"11-21":"요즘 가장 고치고 싶은 습관은?",
+"11-22":"내 삶을 영화로 만든다면 제목과 장르는?",
+"11-23":"요즘 집 근처에 새로 생긴 곳 중 가본 곳은?",
+"11-24":"한 달 식비는 대략 얼마인가?",
+"11-25":"요즘 알고리즘이 나에게 가장 많이 추천하는 것은?",
+"11-26":"외로움을 느끼는 때가 있다면 언제인가?",
+"11-27":"요즘 어떤 사람들과 있을 때 가장 편한가?",
+"11-28":"오늘 가장 집중했던 일은?",
+"11-29":"쉬는 시간에 꼭 곁에 두는 것은? (음료, 담요, 음악…)",
+"11-30":"이번 달 가장 기억에 남는 일은?",
+"12-01":"올해 가장 기대했던 일은 어땠나?",
+"12-02":"올해를 한 단어로?",
+"12-03":"올해 나에게 준 가장 좋은 선물은?",
+"12-04":"올해 가장 좋았던 장소는?",
+"12-05":"올해 가장 많이 만난 사람은?",
+"12-06":"올해 처음 해본 것들을 전부 적어본다면?",
+"12-07":"올해 가장 좋았던 풍경은?",
+"12-08":"올해 읽은 책은 몇 권? 가장 좋았던 책은?",
+"12-09":"올해 가장 맛있었던 음식은?",
+"12-10":"올해 여행은 몇 번 갔나?",
+"12-11":"올해 새로 배운 것은?",
+"12-12":"올해 가장 잘 지킨 루틴은?",
+"12-13":"1월에 그만두고 싶다던 것, 지금은 어떻게 됐나?",
+"12-14":"올해 실제 평균 걸음 수는?",
+"12-15":"올해 가장 바빴던 달과 가장 여유로웠던 달은?",
+"12-16":"올해 가장 자주 한 작은 즐거움은?",
+"12-17":"올해 나에게 준 가장 좋은 경험은?",
+"12-18":"올해 생일은 어떻게 보냈나?",
+"12-19":"올해 내 몸에 가장 좋았던 것과 나빴던 것은?",
+"12-20":"올해 돈을 가장 많이 쓴 영역은?",
+"12-21":"올해 본 전시나 공연 중 최고는?",
+"12-22":"올해 운동은 얼마나 했나?",
+"12-23":"올해 가장 많이 느낀 기분은?",
+"12-24":"올해 저축한 금액은?",
+"12-25":"1월에 한 나와의 약속은 지켰나?",
+"12-26":"올해 가장 잘한 결정은?",
+"12-27":"올해 처음 혼자 해본 것은?",
+"12-28":"올해 가족과 한 일 중 가장 좋았던 것은?",
+"12-29":"올해 한 가장 큰 모험은?",
+"12-30":"올해 가장 좋았던 하루는?",
+"12-31":"1월 31일에 바랐던 변화는 얼마나 이뤄졌나?"
+};
+
+const DEF=()=>({version:3,events:[],notes:{},sampleNotes:[],answers:{},sampleAnswers:[],settings:{theme:'system',weekStart:0,holidays:true,kinds:DEF_KINDS(),questions:{}}});
 let S, V;
 function uid(){return Math.random().toString(36).slice(2,10)+Date.now().toString(36)}
 function firstGrapheme(s){ s=String(s||'').trim(); if(!s) return ''; try{ const seg=new Intl.Segmenter('ko',{granularity:'grapheme'}); for(const g of seg.segment(s)) return g.segment }catch(e){} return [...s][0]||'' }
@@ -362,16 +764,22 @@ function migrate(d){
   const notes={}; if(d.notes&&typeof d.notes==='object') for(const [k,v] of Object.entries(d.notes)){ const t=String(v||'').trim(); if(isDate(k)&&t) notes[k]=t.slice(0,NOTE_MAX) }
   d.notes=notes;
   d.sampleNotes=(Array.isArray(d.sampleNotes)?d.sampleNotes:[]).filter(isDate);
+  const answers={}; if(d.answers&&typeof d.answers==='object') for(const [k,v] of Object.entries(d.answers)){ const t=String(v||'').trim(); if(isDate(k)&&t) answers[k]=t.slice(0,ANS_MAX) }
+  d.answers=answers;
+  d.sampleAnswers=(Array.isArray(d.sampleAnswers)?d.sampleAnswers:[]).filter(isDate);
   const s=Object.assign({theme:'system',weekStart:0,holidays:true},d.settings||{});
   s.weekStart=s.weekStart===1?1:0; s.holidays=s.holidays!==false;
   if(Array.isArray(s.kinds)) s.kinds=s.kinds.map(k=>k&&typeof k==='object'?{id:String(k.id||uid()).slice(0,40),icon:firstGrapheme(k.icon)||'📌',name:String(k.name||'').trim().slice(0,12)}:null).filter(k=>k&&k.name);
   else s.kinds=DEF_KINDS();
-  d.settings=s; d.version=2;
+  const qs={}; if(s.questions&&typeof s.questions==='object') for(const [k,v] of Object.entries(s.questions)){ const t=String(v||'').trim(); if(/^\d{2}-\d{2}$/.test(k)&&t) qs[k]=t.slice(0,Q_MAX) }
+  s.questions=qs;
+  if(!s.questionsSeeded){ for(const [k,v] of Object.entries(DEF_QUESTIONS)) if(!s.questions[k]) s.questions[k]=v; s.questionsSeeded=true }
+  d.settings=s; d.version=3;
   sortE(d); return d;
 }
 function sortE(d){ d.events.sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:(a.time||'').localeCompare(b.time||'')) }
 function save(){ sortE(S); try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('저장하지 못했어요. 저장 공간을 확인해 주세요')} }
-function loadView(){ try{ const v=JSON.parse(localStorage.getItem(KEY+'.view')); if(v&&/^\d{4}-\d{2}$/.test(v.month)){ if(!isDate(v.sel)) v.sel=today(); if(!isDate(v.week)) v.week=mondayOf(today()); if(v.tab!=='week') v.tab='cal'; return v } }catch(e){} return {month:today().slice(0,7),sel:today(),week:mondayOf(today()),tab:'cal'} }
+function loadView(){ try{ const v=JSON.parse(localStorage.getItem(KEY+'.view')); if(v&&/^\d{4}-\d{2}$/.test(v.month)){ if(!isDate(v.sel)) v.sel=today(); if(!isDate(v.week)) v.week=mondayOf(today()); if(!isDate(v.day)) v.day=today(); if(!['week','daily'].includes(v.tab)) v.tab='cal'; return v } }catch(e){} return {month:today().slice(0,7),sel:today(),week:mondayOf(today()),day:today(),tab:'cal'} }
 function saveView(){ try{localStorage.setItem(KEY+'.view',JSON.stringify(V))}catch(e){} }
 // 처음 열면 예시 일정과 예시 기록을 넣어 어떻게 보이는지 보여준다. 전부 sample 표시가 있어 한 번에 지울 수 있다
 function seed(){
@@ -388,6 +796,11 @@ function seed(){
   ];
   s.notes[addDays(t,-1)]='연차 쓰고 집에서 쉼'; s.notes[addDays(t,-3)]='팀 회식. 2차는 빠짐';
   s.sampleNotes=[addDays(t,-1),addDays(t,-3)];
+  // 일간: 작년·재작년 오늘의 예시 답
+  const y=d.getFullYear(), md=t.slice(5);
+  s.answers[`${y-1}-${md}`]='집 근처 새로 생긴 카페에서 오후 내내 책 읽음. 오랜만에 아무 계획 없는 하루.';
+  s.answers[`${y-2}-${md}`]='회사 워크숍 다녀옴. 피곤했지만 팀원들이랑 많이 웃은 날.';
+  s.sampleAnswers=[`${y-1}-${md}`,`${y-2}-${md}`];
   return migrate(s);
 }
 
@@ -503,14 +916,18 @@ const I={
 function render(){
   applyTheme();
   const tab=V.tab||'cal';
-  document.getElementById('main').innerHTML=(S.events.some(e=>e.sample)||S.sampleNotes.length?sampleNotice():'')+(tab==='week'?weekPage():calendar()+selectedDay());
+  document.getElementById('main').innerHTML=(S.events.some(e=>e.sample)||S.sampleNotes.length||S.sampleAnswers.length?sampleNotice():'')+(tab==='week'?weekPage():tab==='daily'?dailyPage():calendar()+selectedDay());
+  document.querySelector('.fab').hidden=tab==='daily';
+  if(SWIPE){ const zone=tab==='cal'?document.querySelector('#main .cal'):document.getElementById('main'); if(zone){ zone.classList.add(SWIPE>0?'swipe-next':'swipe-prev'); zone.addEventListener('animationend',()=>zone.classList.remove('swipe-next','swipe-prev'),{once:true}) } SWIPE=0 }
   document.getElementById('tabbar').innerHTML=`
     <button type="button" class="${tab==='cal'?'on':''}" data-act="tab" data-tab="cal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>달력</button>
-    <button type="button" class="${tab==='week'?'on':''}" data-act="tab" data-tab="week"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M9 10v9M15 10v9"/></svg>주간</button>`;
+    <button type="button" class="${tab==='week'?'on':''}" data-act="tab" data-tab="week"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M9 10v9M15 10v9"/></svg>주간</button>
+    <button type="button" class="${tab==='daily'?'on':''}" data-act="tab" data-tab="daily"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg>일간</button>`;
 }
 function sampleNotice(){
-  const n=S.events.filter(e=>e.sample).length, m=S.sampleNotes.filter(d=>S.notes[d]).length;
-  return `<div class="notice"><span>예시 일정 ${n}개${m?`와 예시 기록 ${m}개`:''}가 들어 있어요. 어떻게 보이는지 살펴본 뒤 지우고 진짜 일정을 넣어 보세요.</span><button type="button" data-act="clear-sample">예시 지우기</button></div>`;
+  const n=S.events.filter(e=>e.sample).length, m=S.sampleNotes.filter(d=>S.notes[d]).length, a=S.sampleAnswers.filter(d=>S.answers[d]).length;
+  const parts=[n?`예시 일정 ${n}개`:'',m?`예시 기록 ${m}개`:'',a?`예시 답 ${a}개`:''].filter(Boolean).join(', ');
+  return `<div class="notice"><span>${parts}가 들어 있어요. 어떻게 보이는지 살펴본 뒤 지우고 진짜 일정을 넣어 보세요.</span><button type="button" data-act="clear-sample">예시 지우기</button></div>`;
 }
 function calendar(){
   const [y,m]=V.month.split('-').map(Number);
@@ -622,6 +1039,89 @@ function weekPage(){
     <div class="empty small" style="padding-top:14px">한 줄 기록은 달력에는 보이지 않고 여기서만 보여요.</div>`;
 }
 
+/* ====================== 일간 (매년 같은 날, 같은 질문) ====================== */
+const questionOf=md=>S.settings.questions[md]||'';
+const answerYears=md=>Object.keys(S.answers).filter(k=>k.slice(5)===md).map(k=>Number(k.slice(0,4))).sort((a,b)=>b-a);
+function dailyPage(){
+  const d=V.day||today(), t=today(), md=d.slice(5), y=Number(d.slice(0,4)), dd=parse(d);
+  const q=questionOf(md), yrs=answerYears(md), cur=S.answers[d], others=yrs.filter(v=>v!==y);
+  const row=date=>{ const yy=date.slice(0,4); const isSample=S.sampleAnswers.includes(date); return `<button type="button" class="arow ${date===d?'cur':''}" data-act="answer" data-date="${date}"><div class="ay">${yy}<small>${Number(yy)===Number(t.slice(0,4))?'올해':`${Number(t.slice(0,4))-Number(yy)}년 전`}</small></div><div class="at">${esc(S.answers[date])}${isSample?' <span class="pill warn">예시</span>':''}</div></button>` };
+  return `<div class="wkhead">
+      <button type="button" class="cal-title" data-act="pick-day" aria-label="날짜 선택">${dd.getMonth()+1}월 ${dd.getDate()}일 <span class="y">${WD[dd.getDay()]} · ${y}</span>${I.down}</button>
+      <div class="cal-nav">
+        ${d===t?'':'<button type="button" class="btn sm ghost" data-act="day-today">오늘</button>'}
+        <button type="button" class="iconbtn" data-act="day-prev" aria-label="이전 날">${I.prev}</button>
+        <button type="button" class="iconbtn" data-act="day-next" aria-label="다음 날">${I.next}</button>
+      </div></div>
+    <section class="qcard">
+      <div class="eyebrow">${dd.getMonth()+1}월 ${dd.getDate()}일의 질문</div>
+      <p class="q ${q?'':'none'}">${esc(q||'이 날의 질문이 비어 있어요. 연필을 눌러 적거나, 설정에서 기본 질문으로 되돌릴 수 있어요.')}</p>
+      <button type="button" class="iconbtn qedit" data-act="edit-q" data-md="${md}" aria-label="질문 고치기" title="질문 고치기">${I.pen}</button>
+      <div class="qmeta">${yrs.length?`${yrs.length}개 해의 답이 있어요 · 매년 이 날 같은 질문이 나와요`:'아직 답이 없어요 · 매년 이 날 같은 질문이 나와요'}</div>
+    </section>
+    <div class="dayhead" style="margin-top:16px;padding-left:20px"><span class="d ${d===t?'today':''}">${y}년의 답</span></div>
+    <div class="list">${cur?row(d):`<button type="button" class="addrow" data-act="answer" data-date="${d}">${I.pen}${y}년 ${dd.getMonth()+1}월 ${dd.getDate()}일의 답 적기</button>`}</div>
+    <div class="dayhead" style="margin-top:16px;padding-left:20px"><span class="d">다른 해의 답</span><span class="c">${others.length?others.length+'개':''}</span></div>
+    <div class="list">${others.map(v=>row(`${v}-${md}`)).join('')||`<div class="empty">아직 다른 해의 답이 없어요.<br>내년 오늘 같은 질문을 다시 만나요.</div>`}<button type="button" class="addrow" data-act="answer-year" data-md="${md}">${I.plus}다른 해의 답 넣기</button></div>
+    <div class="empty small" style="padding-top:14px">답은 일간 탭과 검색에서만 보여요. 달력과 주간에는 나오지 않아요.</div>`;
+}
+function answerSheet(date){
+  const cur=S.answers[date]||'', md=date.slice(5), q=questionOf(md), dd=parse(date);
+  const body=`${q?`<div class="infobox">${esc(q)}</div>`:''}
+    ${field(`${dd.getFullYear()}년의 답`,`<textarea class="input" name="ans" rows="5" maxlength="${ANS_MAX}" placeholder="이 해의 답을 적어요. 길어도 돼요." enterkeyhint="enter">${esc(cur)}</textarea>`,`${ANS_MAX}자까지 · 줄바꿈도 돼요`)}`;
+  const form=openSheet(`${dd.getFullYear()}년 ${dd.getMonth()+1}월 ${dd.getDate()}일`,body,{
+    submitLabel:'저장',
+    extraFooter:cur?`<button type="button" class="btn danger" id="delAns">지우기</button>`:'',
+    onSubmit:f=>{ const v=f.ans.value.trim().slice(0,ANS_MAX); if(v) S.answers[date]=v; else delete S.answers[date]; S.sampleAnswers=S.sampleAnswers.filter(x=>x!==date); save(); closeSheet(); render(); toast(v?'답을 저장했어요':'지웠어요') }
+  });
+  setTimeout(()=>{ try{ form.ans.focus(); form.ans.setSelectionRange(cur.length,cur.length) }catch(e){} },50);
+  const del=form.querySelector('#delAns'); if(del) del.addEventListener('click',()=>{ delete S.answers[date]; S.sampleAnswers=S.sampleAnswers.filter(x=>x!==date); save(); closeSheet(); render(); toast('지웠어요') });
+}
+function answerYearSheet(md){
+  const ty=Number(today().slice(0,4)); const have=new Set(answerYears(md));
+  const opts=[]; for(let y=ty;y>=ty-30;y--) opts.push(`<option value="${y}"${have.has(y)?' disabled':''}>${y}년${have.has(y)?' (있음)':''}</option>`);
+  const body=`${field('어느 해의 답인가요',`<select class="input" name="year">${opts.join('')}</select>`,'종이 일기장에 있던 답을 옮겨 적을 때 써요')}`;
+  openSheet('다른 해의 답 넣기',body,{submitLabel:'다음',onSubmit:f=>{ const y=Number(f.year.value); const [m,dd]=md.split('-').map(Number); const date=`${y}-${pad(m)}-${pad(Math.min(dd,dim(y,m-1)))}`; closeSheet(); answerSheet(date) }});
+}
+function questionSheet(md){
+  const cur=questionOf(md); const [m,dd]=md.split('-').map(Number);
+  const body=`${field(`${m}월 ${dd}일의 질문`,`<textarea class="input" name="q" rows="3" maxlength="${Q_MAX}" placeholder="예: 요즘 가장 기다리는 일은?">${esc(cur)}</textarea>`,'매년 이 날 이 질문이 나와요. 질문 목록 전체는 설정에서 한 번에 넣을 수 있어요.')}`;
+  const form=openSheet('질문 고치기',body,{submitLabel:'저장',extraFooter:cur?`<button type="button" class="btn danger" id="delQ">지우기</button>`:'',onSubmit:f=>{ const v=f.q.value.trim().slice(0,Q_MAX); if(v) S.settings.questions[md]=v; else delete S.settings.questions[md]; save(); closeSheet(); render(); toast(v?'질문을 저장했어요':'질문을 지웠어요') }});
+  setTimeout(()=>{ try{ form.q.focus() }catch(e){} },50);
+  const del=form.querySelector('#delQ'); if(del) del.addEventListener('click',()=>{ delete S.settings.questions[md]; save(); closeSheet(); render(); toast('질문을 지웠어요') });
+}
+// 질문 목록 붙여넣기: "1월 1일 질문", "01-01 질문", "1/1 질문" 또는 날짜 없이 1월 1일부터 순서대로
+function parseQuestions(text){
+  const lines=String(text||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const out={}; let seq=[];
+  const re=/^(?:(\d{1,2})\s*월\s*(\d{1,2})\s*일|(\d{1,2})[-\/.](\d{1,2}))\s*[.:)\-]?\s*(.+)$/;
+  for(const l of lines){ const m=l.match(re); if(m){ const mo=Number(m[1]||m[3]), da=Number(m[2]||m[4]); if(mo>=1&&mo<=12&&da>=1&&da<=31) out[`${pad(mo)}-${pad(da)}`]=m[5].trim().slice(0,Q_MAX) } else seq.push(l) }
+  if(seq.length&&!Object.keys(out).length){ // 순서대로: 365줄이면 2/29 건너뜀, 366줄이면 포함
+    const days=[]; for(let m=1;m<=12;m++) for(let d=1;d<=dim(2024,m-1);d++) days.push(`${pad(m)}-${pad(d)}`);
+    const list=seq.length===365?days.filter(x=>x!=='02-29'):days;
+    list.forEach((md,i)=>{ if(seq[i]) out[md]=seq[i].slice(0,Q_MAX) });
+    if(seq.length===365) out['02-29']=out['02-28'];
+  }
+  return {out,dated:Object.keys(out).length,seq:seq.length};
+}
+function dayPicker(){
+  const d=V.day||today(), t=today(); let [py,pm]=d.split('-').map(Number);
+  const body=`<div class="yrow"><button type="button" class="iconbtn" data-y="-1" aria-label="이전 달">${I.prev}</button><span class="yl" id="yl"></span><button type="button" class="iconbtn" data-y="1" aria-label="다음 달">${I.next}</button></div><div class="dpick" id="dp"></div><div class="hint" style="margin-top:10px;font-size:12px;color:var(--muted)">점이 있는 날은 어느 해든 답이 있는 날이에요.</div>`;
+  const form=openSheet('이동할 날 선택',body,{submitLabel:'오늘로',onSubmit:()=>{ V.day=t; saveView(); closeSheet(); render() }});
+  const answeredMD=new Set(Object.keys(S.answers).map(k=>k.slice(5)));
+  const draw=()=>{
+    form.querySelector('#yl').textContent=`${py}년 ${pm}월`;
+    const first=new Date(py,pm-1,1).getDay(), days=dim(py,pm-1);
+    let h=WD.map(w=>`<span class="dow">${w}</span>`).join('');
+    for(let i=0;i<first;i++) h+='<span></span>';
+    for(let k=1;k<=days;k++){ const date=`${py}-${pad(pm)}-${pad(k)}`; const md=date.slice(5); h+=`<button type="button" data-d="${date}" class="${date===d?'on':''} ${date===t?'cur':''} ${answeredMD.has(md)?'has':''} ${date>t?'out':''}">${k}</button>` }
+    form.querySelector('#dp').innerHTML=h;
+  };
+  form.querySelectorAll('[data-y]').forEach(b=>b.addEventListener('click',()=>{ pm+=Number(b.dataset.y); if(pm<1){pm=12;py--} if(pm>12){pm=1;py++} draw() }));
+  form.querySelector('#dp').addEventListener('click',e=>{ const b=e.target.closest('[data-d]'); if(!b) return; V.day=b.dataset.d; saveView(); closeSheet(); render() });
+  draw();
+}
+
 /* ====================== 검색 ====================== */
 let Q='', KF=''; // KF: '' 전체, 'none' 일반, 그 외 종류 id
 const matchKind=ev=>!KF||(KF==='none'?!kindOf(ev.kind):ev.kind===KF);
@@ -654,9 +1154,11 @@ function searchBody(){
   occ.sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:(a.ev.time||'').localeCompare(b.ev.time||''));
   const up=occ.filter(o=>o.end>=t), past=occ.filter(o=>o.end<t).reverse();
   const notes=KF?[]:Object.entries(S.notes).filter(([d,v])=>norm(v).includes(q)).sort((a,b)=>a[0]<b[0]?1:-1);
-  if(!occ.length&&!notes.length) return `<div class="empty" style="padding-top:30px"><b>"${esc(Q.trim())}" 결과가 없어요</b>${KF?`${esc(kfLabel())} 종류 안에서 찾았어요. 전체로 바꾸면 더 나올 수 있어요.`:'제목, 장소, 메모, 한 줄 기록에서 찾아요. 띄어쓰기는 무시해요.'}</div>`;
+  const answers=KF?[]:Object.entries(S.answers).filter(([d,v])=>norm(v).includes(q)||norm(questionOf(d.slice(5))).includes(q)).sort((a,b)=>a[0]<b[0]?1:-1);
+  if(!occ.length&&!notes.length&&!answers.length) return `<div class="empty" style="padding-top:30px"><b>"${esc(Q.trim())}" 결과가 없어요</b>${KF?`${esc(kfLabel())} 종류 안에서 찾았어요. 전체로 바꾸면 더 나올 수 있어요.`:'제목, 장소, 메모, 한 줄 기록, 일간 답에서 찾아요. 띄어쓰기는 무시해요.'}</div>`;
+  const ansHtml=answers.length?`<div class="eyebrow">일간 답</div><div class="list">${answers.map(([d,v])=>`<button type="button" class="arow" data-act="answer" data-date="${d}"><div class="ay">${d.slice(0,4)}<small>${esc(kshort(d))}</small></div><div class="at">${hl(v,q)}</div></button>`).join('')}</div>`:'';
   const noteHtml=notes.length?`<div class="eyebrow">한 줄 기록</div><div class="list">${notes.map(([d,v])=>`<button type="button" class="noteline" data-act="note" data-date="${d}">${I.pen}<span class="tx">${hl(v,q)}</span><span class="tag">${esc(kshort(d))}</span></button>`).join('')}</div>`:'';
-  return `<div class="rescount">${KF?esc(kfLabel())+' · ':''}일정 <b>${evs.length}</b>개${KF?'':` · 기록 <b>${notes.length}</b>개`}${evs.some(e=>e.repeat!=='none')?' · 반복 일정은 앞뒤 1년치만 보여요':''}</div>${section('다가오는 일정',up,false)}${section('지난 일정',past,false)}${noteHtml}`;
+  return `<div class="rescount">${KF?esc(kfLabel())+' · ':''}일정 <b>${evs.length}</b>개${KF?'':` · 기록 <b>${notes.length}</b>개 · 답 <b>${answers.length}</b>개`}${evs.some(e=>e.repeat!=='none')?' · 반복 일정은 앞뒤 1년치만 보여요':''}</div>${section('다가오는 일정',up,false)}${section('지난 일정',past,false)}${noteHtml}${ansHtml}`;
 }
 function kindChips(){
   const chip=(v,label)=>`<button type="button" class="fchip ${KF===v?'on':''}" data-kf="${esc(v)}">${label}</button>`;
@@ -664,7 +1166,7 @@ function kindChips(){
 }
 function searchSheet(){
   KF='';
-  const body=`<div class="search">${I.search}<input type="search" id="q" placeholder="제목·장소·메모·한 줄 기록 검색" value="${esc(Q)}" autocomplete="off" enterkeyhint="search" aria-label="검색"><button type="button" class="clr" id="qClr" aria-label="검색어 지우기"${Q?'':' hidden'}>${I.x}</button></div><div class="fchips" id="kf">${kindChips()}</div><div id="listBody">${searchBody()}</div>`;
+  const body=`<div class="search">${I.search}<input type="search" id="q" placeholder="제목·장소·메모·기록·일간 답 검색" value="${esc(Q)}" autocomplete="off" enterkeyhint="search" aria-label="검색"><button type="button" class="clr" id="qClr" aria-label="검색어 지우기"${Q?'':' hidden'}>${I.x}</button></div><div class="fchips" id="kf">${kindChips()}</div><div id="listBody">${searchBody()}</div>`;
   const form=openSheet('검색',body,{submitLabel:'닫기',onSubmit:()=>closeSheet(),tall:true});
   form.querySelector('#kf').addEventListener('click',e=>{ const b=e.target.closest('[data-kf]'); if(!b) return; KF=b.dataset.kf; form.querySelectorAll('[data-kf]').forEach(x=>x.classList.toggle('on',x.dataset.kf===KF)); form.querySelector('#listBody').innerHTML=searchBody() });
   form.querySelector('.sheet-f .btn.primary').classList.replace('primary','ghost');
@@ -805,9 +1307,10 @@ function settingsSheet(){
     <div class="field"><span class="k">종류 (달력에 보이는 아이콘)</span><div class="klist" id="klist">${s.kinds.map(krow).join('')}</div><div class="inline" style="margin-top:8px"><button type="button" class="btn sm" id="kAdd">${I.plus}종류 추가</button></div><div class="hint">왼쪽 칸에 이모지 하나, 오른쪽에 이름을 적어요. 왼쪽 ⋮⋮ 를 누른 채 위아래로 끌면 순서가 바뀌고, 일정 추가 창의 드롭다운 순서도 같이 바뀌어요. 지운 종류의 일정은 "일반"으로 바뀌고 일정 자체는 남아요.</div></div>
     <div class="toggle" style="margin-top:14px"><div><div class="l">공휴일 표시</div><div class="h">설날·추석·대체공휴일까지 2030년분이 들어 있어요</div></div><button type="button" class="switch ${s.holidays?'on':''}" id="holSw" role="switch" aria-checked="${s.holidays}" aria-label="공휴일 표시"></button></div>
     <div class="toggle"><div><div class="l">달력을 월요일부터</div><div class="h">끄면 일요일이 첫 칸이에요. 주간 탭은 항상 월요일부터예요</div></div><button type="button" class="switch ${s.weekStart===1?'on':''}" id="wsSw" role="switch" aria-checked="${s.weekStart===1}" aria-label="달력을 월요일부터"></button></div>
+    <div class="field"><span class="k">일간 질문 목록 (${Object.keys(s.questions).length}/366일)</span><textarea class="input qimport" id="qText" rows="4" placeholder="한 줄에 질문 하나씩 붙여넣기&#10;예) 1월 1일 올해 꼭 해보고 싶은 것은?&#10;날짜 없이 1월 1일부터 순서대로 365줄(또는 366줄)을 넣어도 돼요"></textarea><div class="inline" style="margin-top:8px"><button type="button" class="btn sm" id="qLoad">불러오기</button><button type="button" class="btn sm ghost" id="qReset">기본 질문으로 되돌리기</button><button type="button" class="btn sm ghost" id="qClear">질문 전체 지우기</button></div><div class="hint">기본 질문 365개가 들어 있어요. 한 날짜만 고칠 땐 일간 탭의 연필을, 여러 날을 바꿀 땐 여기 붙여넣기를 써요. 같은 날짜가 이미 있으면 새 질문으로 바뀌고 답은 그대로 남아요. "되돌리기"는 고친 질문을 모두 기본으로 바꿔요.</div></div>
     ${field('화면 테마',`<select class="input" name="theme"><option value="system"${s.theme==='system'?' selected':''}>기기 설정 따라가기</option><option value="light"${s.theme==='light'?' selected':''}>라이트</option><option value="dark"${s.theme==='dark'?' selected':''}>다크</option></select>`)}
-    ${field('전체 삭제',`<button type="button" class="btn sm danger" id="wipeBtn">모든 일정과 기록 지우기</button>`,'백업하지 않았다면 복구할 수 없어요. 종류 설정은 남아요.')}
-    <div class="hint" style="margin-top:14px">일정 ${S.events.length}개 · 한 줄 기록 ${Object.keys(S.notes).length}개 · 데이터는 이 기기 안에만 저장돼요.</div>`;
+    ${field('전체 삭제',`<button type="button" class="btn sm danger" id="wipeBtn">모든 일정·기록·답 지우기</button>`,'백업하지 않았다면 복구할 수 없어요. 종류와 질문 설정은 남아요.')}
+    <div class="hint" style="margin-top:14px">일정 ${S.events.length}개 · 한 줄 기록 ${Object.keys(S.notes).length}개 · 일간 답 ${Object.keys(S.answers).length}개 · 데이터는 이 기기 안에만 저장돼요.</div>`;
   const form=openSheet('설정',body,{submitLabel:'저장',onSubmit:f=>{
     const rows=[...f.querySelectorAll('.krow')]; const kinds=[];
     for(const r of rows){ const name=r.querySelector('[data-k=name]').value.trim().slice(0,12); const icon=firstGrapheme(r.querySelector('[data-k=icon]').value)||'📌'; if(!name){ r.querySelector('[data-k=name]').focus(); return toast('종류 이름을 입력해 주세요') } kinds.push({id:r.dataset.id,icon,name}) }
@@ -831,23 +1334,27 @@ function settingsSheet(){
     if(used&&!b.dataset.armed){ b.dataset.armed='1'; toast(`이 종류를 쓰는 일정이 ${used}개 있어요. 한 번 더 누르면 지워요`); setTimeout(()=>{ delete b.dataset.armed },3000); return }
     r.remove() });
   kl.addEventListener('input',e=>{ if(e.target.dataset.k!=='icon') return; const g=firstGrapheme(e.target.value); if(g&&e.target.value.trim()!==g) e.target.value=g });
+  form.querySelector('#qLoad').addEventListener('click',()=>{ const {out,dated,seq}=parseQuestions(form.querySelector('#qText').value); if(!dated) return toast('읽을 수 있는 줄이 없어요. 한 줄에 질문 하나씩 넣어 주세요'); Object.assign(S.settings.questions,out); save(); form.querySelector('#qText').value=''; form.querySelector('.field .k').textContent; toast(`질문 ${dated}개를 넣었어요${seq&&seq!==365&&seq!==366&&dated<seq?` (날짜 없는 ${seq}줄은 1월 1일부터 순서대로)`:''}`); closeSheet(); settingsSheet() });
+  const qr=form.querySelector('#qReset'); qr.addEventListener('click',()=>{ if(!qr.dataset.armed){qr.dataset.armed='1';qr.textContent='정말 기본으로';return} S.settings.questions=Object.assign({},DEF_QUESTIONS); S.settings.questionsSeeded=true; save(); toast('기본 질문 365개로 되돌렸어요. 답은 남아 있어요'); closeSheet(); settingsSheet() });
+  const qc=form.querySelector('#qClear'); qc.addEventListener('click',()=>{ if(!qc.dataset.armed){qc.dataset.armed='1';qc.textContent='정말 전체 지우기';return} S.settings.questions={}; S.settings.questionsSeeded=true; save(); toast('질문을 모두 지웠어요. 답은 남아 있어요. 되돌리기로 기본 질문을 다시 넣을 수 있어요'); closeSheet(); settingsSheet() });
   const hs=form.querySelector('#holSw'), ws=form.querySelector('#wsSw');
   hs.addEventListener('click',()=>{ S.settings.holidays=!S.settings.holidays; hs.classList.toggle('on',S.settings.holidays); hs.setAttribute('aria-checked',S.settings.holidays); save(); render() });
   ws.addEventListener('click',()=>{ S.settings.weekStart=S.settings.weekStart===1?0:1; ws.classList.toggle('on',S.settings.weekStart===1); ws.setAttribute('aria-checked',S.settings.weekStart===1); save(); render() });
   form.theme.addEventListener('change',()=>{ S.settings.theme=form.theme.value; applyTheme() });
   const wb=form.querySelector('#wipeBtn');
-  wb.addEventListener('click',()=>{ if(!wb.dataset.armed){wb.dataset.armed='1';wb.textContent='정말 모두 지우기';return} S.events=[]; S.notes={}; S.sampleNotes=[]; save(); closeSheet(); render(); toast('모든 일정과 기록을 지웠어요') });
+  wb.addEventListener('click',()=>{ if(!wb.dataset.armed){wb.dataset.armed='1';wb.textContent='정말 모두 지우기';return} S.events=[]; S.notes={}; S.sampleNotes=[]; S.answers={}; S.sampleAnswers=[]; save(); closeSheet(); render(); toast('모든 일정·기록·답을 지웠어요') });
 }
 function applyTheme(){ const th=S.settings.theme; if(th==='light'||th==='dark') document.documentElement.setAttribute('data-theme',th); else document.documentElement.removeAttribute('data-theme') }
 
 /* 백업 */
 function backupSheet(){
   const notes={}; for(const [d,v] of Object.entries(S.notes)) if(!S.sampleNotes.includes(d)) notes[d]=v;
-  const json=JSON.stringify({app:'sched-cal',version:2,exportedAt:new Date().toISOString(),settings:S.settings,events:S.events.filter(e=>!e.sample),notes});
+  const answers={}; for(const [d,v] of Object.entries(S.answers)) if(!S.sampleAnswers.includes(d)) answers[d]=v;
+  const json=JSON.stringify({app:'sched-cal',version:3,exportedAt:new Date().toISOString(),settings:S.settings,events:S.events.filter(e=>!e.sample),notes,answers});
   const fname=`일정달력-${today()}.json`;
-  const nEv=S.events.filter(e=>!e.sample).length, nNote=Object.keys(notes).length;
+  const nEv=S.events.filter(e=>!e.sample).length, nNote=Object.keys(notes).length, nAns=Object.keys(answers).length;
   const body=`<div class="small muted">데이터는 이 폰의 브라우저 안에만 있어요. 폰을 바꾸거나 브라우저 데이터를 지우면 사라지니 가끔 백업해 두세요. 폰에서는 "파일로 공유"가 제일 편해요. AirDrop이나 카카오톡 나에게 보내기, iCloud Drive로 보낼 수 있어요.</div>
-  ${field('내보내기',`<div class="inline"><button type="button" class="btn sm primary" id="shareBtn">파일로 공유</button><button type="button" class="btn sm" id="copyBtn">전체 복사</button><button type="button" class="btn sm ghost" id="dlBtn">파일로 저장</button></div><textarea class="input mono" id="exportBox" readonly rows="3" style="margin-top:8px">${esc(json)}</textarea>`,`일정 ${nEv}개 · 한 줄 기록 ${nNote}개 · 종류 설정 포함 · ${Math.max(1,Math.round(json.length/1024))}KB · ${esc(fname)}`)}
+  ${field('내보내기',`<div class="inline"><button type="button" class="btn sm primary" id="shareBtn">파일로 공유</button><button type="button" class="btn sm" id="copyBtn">전체 복사</button><button type="button" class="btn sm ghost" id="dlBtn">파일로 저장</button></div><textarea class="input mono" id="exportBox" readonly rows="3" style="margin-top:8px">${esc(json)}</textarea>`,`일정 ${nEv}개 · 기록 ${nNote}개 · 일간 답 ${nAns}개 · 종류·질문 설정 포함 · ${Math.max(1,Math.round(json.length/1024))}KB · ${esc(fname)}`)}
   ${field('가져오기',`<div class="inline"><label class="btn sm" style="cursor:pointer">파일 불러오기<input type="file" id="importFile" accept=".json,application/json,text/plain" hidden></label></div><textarea class="input mono" id="importBox" rows="3" placeholder="또는 백업해 둔 내용을 붙여넣기" style="margin-top:8px"></textarea><div class="inline" style="margin-top:8px"><button type="button" class="btn sm" id="mergeBtn">합치기</button><button type="button" class="btn sm danger" id="replaceBtn">전체 덮어쓰기</button></div>`,'파일을 고르거나 붙여넣은 뒤 합치기 또는 덮어쓰기를 눌러요. 합치기는 이미 있는 일정·기록은 건너뛰고 새것만 추가해요')}`;
   const form=openSheet('백업',body,{submitLabel:'닫기',onSubmit:()=>closeSheet()});
   form.querySelector('.sheet-f .btn.primary').classList.replace('primary','ghost');
@@ -856,7 +1363,7 @@ function backupSheet(){
   form.querySelector('#shareBtn').addEventListener('click',async()=>{ try{ const file=new File([json],fname,{type:'application/json'}); if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'일정 달력 백업'}); toast('공유 창을 열었어요') } else if(navigator.share){ await navigator.share({title:'일정 달력 백업',text:json}); toast('텍스트로 공유했어요') } else toast('이 브라우저는 공유를 지원하지 않아요. 복사나 파일 저장을 써 주세요') }catch(e){ if(e&&e.name!=='AbortError') toast('공유하지 못했어요. 복사나 파일 저장을 써 주세요') } });
   form.querySelector('#importFile').addEventListener('change',ev=>{ const f=ev.target.files&&ev.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{ form.querySelector('#importBox').value=String(r.result||''); toast(`${f.name} 읽었어요. 합치기 또는 덮어쓰기를 눌러 주세요`) }; r.onerror=()=>toast('파일을 읽지 못했어요'); r.readAsText(f) });
   const parseIn=()=>{ try{ const d=JSON.parse(form.querySelector('#importBox').value); if(!d||!Array.isArray(d.events)) throw 0; return migrate(d) }catch(e){ toast('형식이 맞지 않아요. 백업한 내용 전체를 붙여넣어 주세요'); return null } };
-  form.querySelector('#mergeBtn').addEventListener('click',()=>{ const d=parseIn(); if(!d) return; let n=0,m=0; for(const k of d.settings.kinds) if(!S.settings.kinds.some(x=>x.id===k.id)) S.settings.kinds.push(k); for(const e of d.events){ if(S.events.some(x=>x.id===e.id)) continue; S.events.push(e); n++ } for(const [k,v] of Object.entries(d.notes)){ if(S.notes[k]) continue; S.notes[k]=v; m++ } save(); closeSheet(); render(); toast(`일정 ${n}개, 기록 ${m}개를 가져왔어요`) });
+  form.querySelector('#mergeBtn').addEventListener('click',()=>{ const d=parseIn(); if(!d) return; let n=0,m=0; for(const k of d.settings.kinds) if(!S.settings.kinds.some(x=>x.id===k.id)) S.settings.kinds.push(k); for(const e of d.events){ if(S.events.some(x=>x.id===e.id)) continue; S.events.push(e); n++ } for(const [k,v] of Object.entries(d.notes)){ if(S.notes[k]) continue; S.notes[k]=v; m++ } let a=0; for(const [k,v] of Object.entries(d.answers)){ if(S.answers[k]) continue; S.answers[k]=v; a++ } for(const [k,v] of Object.entries(d.settings.questions)) if(!S.settings.questions[k]) S.settings.questions[k]=v; save(); closeSheet(); render(); toast(`일정 ${n}개, 기록 ${m}개, 답 ${a}개를 가져왔어요`) });
   const rb=form.querySelector('#replaceBtn'); rb.addEventListener('click',()=>{ if(!rb.dataset.armed){rb.dataset.armed='1';rb.textContent='정말 덮어쓰기';return} const d=parseIn(); if(!d) return; d.settings=Object.assign({},S.settings,d.settings||{}); S=d; save(); closeSheet(); render(); toast('덮어썼어요') });
 }
 
@@ -880,13 +1387,31 @@ const ACTIONS={
   'week-prev':()=>shiftWeek(-1),
   'week-next':()=>shiftWeek(1),
   'week-today':()=>{ V.week=mondayOf(today()); saveView(); render() },
+  'day-prev':()=>{ V.day=addDays(V.day||today(),-1); saveView(); render() },
+  'day-next':()=>{ V.day=addDays(V.day||today(),1); saveView(); render() },
+  'day-today':()=>{ V.day=today(); saveView(); render() },
+  'pick-day':()=>dayPicker(),
+  'answer':d=>answerSheet(d.date),
+  'answer-year':d=>answerYearSheet(d.md),
+  'edit-q':d=>questionSheet(d.md),
   'day':d=>{ if(V.sel===d.date){ editSheet(newEvent(d.date),{isNew:true}); return } V.sel=d.date; if(d.date.slice(0,7)!==V.month){ V.month=d.date.slice(0,7) } saveView(); render() },
   'edit':d=>{ const ev=S.events.find(q=>q.id===d.id); if(ev) editSheet(ev) },
   'note':d=>noteSheet(d.date),
   'add':d=>{ let date=d.date; if(!date){ if(V.tab==='week'){ const mon=V.week||mondayOf(today()); const t=today(); date=(t>=mon&&t<=addDays(mon,6))?t:mon } else date=V.sel } editSheet(newEvent(date),{isNew:true}) },
-  'clear-sample':()=>{ S.events=S.events.filter(e=>!e.sample); for(const d of S.sampleNotes) delete S.notes[d]; S.sampleNotes=[]; save(); render(); toast('예시를 지웠어요') },
+  'clear-sample':()=>{ S.events=S.events.filter(e=>!e.sample); for(const d of S.sampleNotes) delete S.notes[d]; S.sampleNotes=[]; for(const d of S.sampleAnswers) delete S.answers[d]; S.sampleAnswers=[]; save(); render(); toast('예시를 지웠어요') },
 };
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const fn=ACTIONS[b.dataset.act]; if(fn) fn(b.dataset) });
+
+/* 좌우로 밀어서 이전·다음: 달력 탭은 달력 카드 안에서, 주간·일간은 본문 어디서든 */
+let SWIPE=0, swStart=null;
+const mainEl=document.getElementById('main');
+mainEl.addEventListener('touchstart',e=>{ if(e.touches.length!==1){ swStart=null; return } const t=e.touches[0]; const zone=V.tab==='cal'?e.target.closest('.cal'):mainEl; swStart=zone?{x:t.clientX,y:t.clientY,at:Date.now()}:null },{passive:true});
+mainEl.addEventListener('touchmove',e=>{ if(!swStart||e.touches.length!==1) return; const t=e.touches[0]; if(Math.abs(t.clientY-swStart.y)>Math.abs(t.clientX-swStart.x)*1.2&&Math.abs(t.clientY-swStart.y)>12) swStart=null /* 세로 스크롤로 판단 */ },{passive:true});
+mainEl.addEventListener('touchend',e=>{ if(!swStart) return; const t=e.changedTouches[0]; const dx=t.clientX-swStart.x, dy=t.clientY-swStart.y, dt=Date.now()-swStart.at; swStart=null;
+  if(dt>1000||Math.abs(dx)<48||Math.abs(dx)<Math.abs(dy)*1.5) return; if(document.getElementById('sheetRoot').firstChild) return;
+  const dir=dx<0?1:-1; SWIPE=dir;
+  if(V.tab==='cal') shiftMonth(dir); else if(V.tab==='week') shiftWeek(dir); else { V.day=addDays(V.day||today(),dir); saveView(); render() } },{passive:true});
+mainEl.addEventListener('touchcancel',()=>{ swStart=null },{passive:true});
 
 /* 날짜가 바뀌면(자정 지나거나 다시 열 때) 다시 그리기 */
 let lastDay=today();
