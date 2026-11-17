@@ -173,7 +173,7 @@ em,i{font-style:normal}
 .noteline{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 14px;border-top:1px solid var(--line);font-size:14px;color:var(--ink);line-height:1.45}
 .noteline:first-child{border-top:0}
 .noteline svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
-.noteline .tx{flex:1;min-width:0;white-space:pre-line;overflow-wrap:anywhere}
+.noteline .tx{flex:1;min-width:0;white-space:pre-line;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .noteline .tx.ph{color:var(--muted)}
 .noteline .tag{font-size:11px;color:var(--muted);font-weight:600;background:var(--surface2);padding:2px 7px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);font-weight:500}
@@ -189,7 +189,7 @@ mark{background:transparent;color:var(--accent);font-weight:700}
 .wkrow:first-child{border-top:0}
 .wkrow .dn{text-align:center;padding-top:2px}
 .wkrow .dn b{display:block;font-family:var(--mono);font-size:18px;font-weight:600;line-height:1.1}
-.wkrow .dn span{font-size:11.5px;color:var(--muted);font-weight:600}
+.wkrow .dn span{display:block;font-size:11.5px;color:var(--muted);font-weight:600;line-height:1.3}
 .wkrow.su .dn b,.wkrow.su .dn span,.wkrow.hol .dn b{color:var(--sun)} .wkrow.sa .dn b,.wkrow.sa .dn span{color:var(--sat)}
 .wkrow.today .dn b{background:var(--accent);color:var(--accent-ink);border-radius:50%;width:30px;height:30px;display:grid;place-items:center;margin:0 auto;font-size:15px}
 .wkrow .body{min-width:0}
@@ -197,9 +197,10 @@ mark{background:transparent;color:var(--accent);font-weight:700}
 .wkrow .chip{font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--c-soft);color:var(--c);display:inline-flex;gap:4px;align-items:center;max-width:100%}
 .wkrow .chip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wkrow .chip.h{background:transparent;color:var(--hol);padding-left:0}
-.wkrow .note{display:block;width:100%;text-align:left;font-size:14px;line-height:1.5;color:var(--ink);border-radius:8px;padding:2px 0;white-space:pre-line;overflow-wrap:anywhere}
+.wkrow .note{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;width:100%;text-align:left;font-size:14px;line-height:1.5;color:var(--ink);border-radius:8px;padding:2px 0;white-space:pre-line;overflow-wrap:anywhere}
 .wkrow .note.empty{color:var(--muted)}
 .wkrow .note.empty::before{content:"＋ ";opacity:.7}
+.wkrow .note.empty{display:block}
 
 /* 일간 */
 .qcard{margin:12px 16px 0;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;position:relative}
@@ -225,6 +226,20 @@ mark{background:transparent;color:var(--accent);font-weight:700}
 .dpick button.has::after{content:"";position:absolute;left:50%;bottom:4px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--accent)}
 .dpick button.on.has::after{background:var(--accent-ink)}
 .qimport{margin-top:8px}
+
+/* 날씨 */
+.wx{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;font-size:17px;line-height:1;color:var(--ink);font-style:normal}
+.wx:hover{background:var(--surface2)}
+.wx.empty{opacity:.28;filter:grayscale(1)}
+.wkrow .dn .wx{display:grid;margin:3px auto 0;width:28px;height:28px;font-size:16px}
+.dayhead .wx{width:28px;height:28px;font-size:16px;margin-left:-2px}
+.wxgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+.wxgrid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:14px;background:var(--surface2);color:var(--ink)}
+.wxgrid button em{font-size:26px;line-height:1.2}
+.wxgrid button span{font-size:11.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+.wxgrid button.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+.wxgrid button.on span{color:var(--accent-deep)}
+.wxgrid button.none em{font-size:16px;font-weight:600;color:var(--muted);line-height:31px}
 
 /* 검색 */
 .search{display:flex;align-items:center;gap:8px;margin:6px 0 0;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:0 10px 0 12px;min-height:46px}
@@ -368,7 +383,8 @@ const KEY='sched-cal.v1';
 const COLORS=[['green','숲'],['teal','민트'],['blue','바다'],['sky','하늘'],['purple','포도'],['lavender','라벤더'],['rose','장미'],['coral','산호'],['orange','살구'],['yellow','노랑'],['brown','갈색'],['gray','잿빛']];
 const REPEATS=[['none','반복 없음'],['weekly','매주'],['monthly','매월'],['yearly','매년']];
 const DEF_KINDS=()=>[{id:'birthday',icon:'🎂',name:'생일'},{id:'anniv',icon:'💐',name:'기념일'},{id:'travel',icon:'✈️',name:'여행'},{id:'meet',icon:'🍽️',name:'약속'},{id:'hospital',icon:'🏥',name:'병원'},{id:'vacation',icon:'🏖️',name:'휴가'}];
-const NOTE_MAX=140, ANS_MAX=1000, Q_MAX=200;
+const NOTE_MAX=20000, ANS_MAX=20000, Q_MAX=200;
+const WEATHERS=[['☀️','맑음'],['🌤️','대체로 맑음'],['⛅','구름 조금'],['☁️','흐림'],['🌧️','비'],['⛈️','천둥번개'],['❄️','눈'],['🌫️','안개·먼지'],['💨','바람'],['🥵','폭염'],['🥶','한파']];
 // 기본 질문 366개 (1월 1일부터). 2월 29일은 2월 28일 질문을 같이 쓴다. 사용자가 고친 질문은 settings.questions에 저장된다
 const DEF_QUESTIONS={
 "01-01":"올해를 시작하면서 가장 기대되는 일은?",
@@ -739,7 +755,7 @@ const DEF_QUESTIONS={
 "12-31":"1월 31일에 바랐던 변화는 얼마나 이뤄졌나?"
 };
 
-const DEF=()=>({version:3,events:[],notes:{},sampleNotes:[],answers:{},sampleAnswers:[],settings:{theme:'system',weekStart:0,holidays:true,kinds:DEF_KINDS(),questions:{}}});
+const DEF=()=>({version:3,events:[],notes:{},sampleNotes:[],answers:{},sampleAnswers:[],weather:{},settings:{theme:'system',weekStart:0,holidays:true,kinds:DEF_KINDS(),questions:{}}});
 let S, V;
 function uid(){return Math.random().toString(36).slice(2,10)+Date.now().toString(36)}
 function firstGrapheme(s){ s=String(s||'').trim(); if(!s) return ''; try{ const seg=new Intl.Segmenter('ko',{granularity:'grapheme'}); for(const g of seg.segment(s)) return g.segment }catch(e){} return [...s][0]||'' }
@@ -767,6 +783,8 @@ function migrate(d){
   const answers={}; if(d.answers&&typeof d.answers==='object') for(const [k,v] of Object.entries(d.answers)){ const t=String(v||'').trim(); if(isDate(k)&&t) answers[k]=t.slice(0,ANS_MAX) }
   d.answers=answers;
   d.sampleAnswers=(Array.isArray(d.sampleAnswers)?d.sampleAnswers:[]).filter(isDate);
+  const weather={}; if(d.weather&&typeof d.weather==='object') for(const [k,v] of Object.entries(d.weather)){ const g=firstGrapheme(v); if(isDate(k)&&g) weather[k]=g }
+  d.weather=weather;
   const s=Object.assign({theme:'system',weekStart:0,holidays:true},d.settings||{});
   s.weekStart=s.weekStart===1?1:0; s.holidays=s.holidays!==false;
   if(Array.isArray(s.kinds)) s.kinds=s.kinds.map(k=>k&&typeof k==='object'?{id:String(k.id||uid()).slice(0,40),icon:firstGrapheme(k.icon)||'📌',name:String(k.name||'').trim().slice(0,12)}:null).filter(k=>k&&k.name);
@@ -1006,7 +1024,7 @@ function selectedDay(){
   const occ=dayOccurrences(d);
   const rows=occ.map(o=>eventRow(o)).join('');
   return `<section class="selbox">
-    <div class="dayhead"><span class="d ${d===t?'today':''}">${esc(kdate(d))}${d===t?' · 오늘':''}</span>${hol?`<span class="h">${esc(hol)}</span>`:''}<span class="c">${occ.length?`${occ.length}개`:''}</span></div>
+    <div class="dayhead"><span class="d ${d===t?'today':''}">${esc(kdate(d))}${d===t?' · 오늘':''}</span>${wxBtn(d)}${hol?`<span class="h">${esc(hol)}</span>`:''}<span class="c">${occ.length?`${occ.length}개`:''}</span></div>
     <div class="list">${rows||`<div class="empty">이 날은 일정이 없어요</div>`}${noteRow(d)}<button type="button" class="addrow" data-act="add" data-date="${d}">${I.plus}이 날에 일정 추가</button></div>
   </section>`;
 }
@@ -1024,7 +1042,7 @@ function weekPage(){
     const list=dmap.get(d)||[];
     const chips=(hol?`<span class="chip h">${esc(hol)}</span>`:'')+list.map(o=>{ const k=kindOf(o.ev.kind); const tm=o.len>0?'':(o.ev.allDay?'':o.ev.time+' '); return `<button type="button" class="chip c-${o.ev.color}" data-act="edit" data-id="${o.ev.id}" data-date="${o.start}">${k?`<em>${esc(k.icon)}</em>`:''}<span>${esc(tm+o.ev.title)}</span></button>` }).join('');
     const n=S.notes[d];
-    rows+=`<div class="${cls.join(' ')}"><div class="dn"><b>${dd.getDate()}</b><span>${WD[dow]}</span></div><div class="body">${chips?`<div class="chips">${chips}</div>`:''}<button type="button" class="note ${n?'':'empty'}" data-act="note" data-date="${d}">${n?esc(n):'한 줄 남기기'}</button></div></div>`;
+    rows+=`<div class="${cls.join(' ')}"><div class="dn"><b>${dd.getDate()}</b><span>${WD[dow]}</span>${wxBtn(d)}</div><div class="body">${chips?`<div class="chips">${chips}</div>`:''}<button type="button" class="note ${n?'':'empty'}" data-act="note" data-date="${d}">${n?esc(n):'한 줄 남기기'}</button></div></div>`;
   }
   const yprefix=wl.y!==parse(t).getFullYear()?`${wl.y}년 `:'';
   return `<div class="wkhead">
@@ -1068,7 +1086,7 @@ function dailyPage(){
 function answerSheet(date){
   const cur=S.answers[date]||'', md=date.slice(5), q=questionOf(md), dd=parse(date);
   const body=`${q?`<div class="infobox">${esc(q)}</div>`:''}
-    ${field(`${dd.getFullYear()}년의 답`,`<textarea class="input" name="ans" rows="5" maxlength="${ANS_MAX}" placeholder="이 해의 답을 적어요. 길어도 돼요." enterkeyhint="enter">${esc(cur)}</textarea>`,`${ANS_MAX}자까지 · 줄바꿈도 돼요`)}`;
+    ${field(`${dd.getFullYear()}년의 답`,`<textarea class="input" name="ans" maxlength="${ANS_MAX}" placeholder="이 해의 답을 적어요. 길어도 돼요." enterkeyhint="enter" rows="7">${esc(cur)}</textarea>`,`길이 제한 없음 · 줄바꿈도 돼요`)}`;
   const form=openSheet(`${dd.getFullYear()}년 ${dd.getMonth()+1}월 ${dd.getDate()}일`,body,{
     submitLabel:'저장',
     extraFooter:cur?`<button type="button" class="btn danger" id="delAns">지우기</button>`:'',
@@ -1250,10 +1268,21 @@ function editSheet(ev,{isNew=false}={}){
 }
 function newEvent(date){ return {id:uid(),title:'',start:date||today(),end:null,allDay:true,time:'',endTime:'',color:'green',kind:'',place:'',memo:'',repeat:'none'} }
 
+/* 날씨 */
+function wxBtn(d){ const w=S.weather[d]; const name=w?((WEATHERS.find(x=>x[0]===w)||[])[1]||''):''; return `<button type="button" class="wx ${w?'':'empty'}" data-act="weather" data-date="${d}" aria-label="${esc(kdate(d))} 날씨${name?' '+name:' 고르기'}" title="${esc(name||'날씨 고르기')}">${esc(w||'☁️')}</button>` }
+function weatherSheet(d){
+  const cur=S.weather[d]||'';
+  const opts=WEATHERS.map(([e,nm])=>`<button type="button" data-wx="${esc(e)}" class="${cur===e?'on':''}"><em>${e}</em><span>${nm}</span></button>`).join('')+`<button type="button" data-wx="" class="none ${cur?'':'on'}"><em>없음</em><span>지우기</span></button>`;
+  const body=`<div class="wxgrid">${opts}</div><div class="hint" style="margin-top:12px;font-size:12px;color:var(--muted)">주간 탭 날짜 아래와 달력의 선택한 날 옆에 보여요. 달력 격자에는 안 나와요.</div>`;
+  const form=openSheet(`${kdate(d,true)} 날씨`,body,{submitLabel:'닫기',onSubmit:()=>closeSheet()});
+  form.querySelector('.sheet-f .btn.primary').classList.replace('primary','ghost');
+  form.querySelector('.wxgrid').addEventListener('click',e=>{ const b=e.target.closest('[data-wx]'); if(!b) return; const v=b.dataset.wx; if(v) S.weather[d]=v; else delete S.weather[d]; save(); closeSheet(); render(); toast(v?`${v} 로 기록했어요`:'날씨를 지웠어요') });
+}
+
 /* 한 줄 기록 */
 function noteSheet(d){
   const cur=S.notes[d]||'';
-  const body=`${field('이 날 한 줄',`<textarea class="input" name="note" rows="4" maxlength="${NOTE_MAX}" placeholder="예: 연차 쓰고 집에서 쉼" enterkeyhint="enter">${esc(cur)}</textarea>`,`${NOTE_MAX}자까지 · 줄바꿈도 돼요 · 달력에는 안 보이고 주간 탭과 그 날 목록에서만 보여요`)}`;
+  const body=`${field('이 날 한 줄',`<textarea class="input" name="note" rows="6" maxlength="${NOTE_MAX}" placeholder="예: 연차 쓰고 집에서 쉼" enterkeyhint="enter">${esc(cur)}</textarea>`,`길이 제한 없음 · 줄바꿈도 돼요 · 주간 탭에는 앞 세 줄만 보이고 누르면 전체가 열려요 · 달력에는 안 보여요`)}`;
   const form=openSheet(kdate(d,true),body,{
     submitLabel:'저장',
     extraFooter:cur?`<button type="button" class="btn danger" id="delNote">지우기</button>`:'',
@@ -1310,7 +1339,7 @@ function settingsSheet(){
     <div class="field"><span class="k">일간 질문 목록 (${Object.keys(s.questions).length}/366일)</span><textarea class="input qimport" id="qText" rows="4" placeholder="한 줄에 질문 하나씩 붙여넣기&#10;예) 1월 1일 올해 꼭 해보고 싶은 것은?&#10;날짜 없이 1월 1일부터 순서대로 365줄(또는 366줄)을 넣어도 돼요"></textarea><div class="inline" style="margin-top:8px"><button type="button" class="btn sm" id="qLoad">불러오기</button><button type="button" class="btn sm ghost" id="qReset">기본 질문으로 되돌리기</button><button type="button" class="btn sm ghost" id="qClear">질문 전체 지우기</button></div><div class="hint">기본 질문 365개가 들어 있어요. 한 날짜만 고칠 땐 일간 탭의 연필을, 여러 날을 바꿀 땐 여기 붙여넣기를 써요. 같은 날짜가 이미 있으면 새 질문으로 바뀌고 답은 그대로 남아요. "되돌리기"는 고친 질문을 모두 기본으로 바꿔요.</div></div>
     ${field('화면 테마',`<select class="input" name="theme"><option value="system"${s.theme==='system'?' selected':''}>기기 설정 따라가기</option><option value="light"${s.theme==='light'?' selected':''}>라이트</option><option value="dark"${s.theme==='dark'?' selected':''}>다크</option></select>`)}
     ${field('전체 삭제',`<button type="button" class="btn sm danger" id="wipeBtn">모든 일정·기록·답 지우기</button>`,'백업하지 않았다면 복구할 수 없어요. 종류와 질문 설정은 남아요.')}
-    <div class="hint" style="margin-top:14px">일정 ${S.events.length}개 · 한 줄 기록 ${Object.keys(S.notes).length}개 · 일간 답 ${Object.keys(S.answers).length}개 · 데이터는 이 기기 안에만 저장돼요.</div>`;
+    <div class="hint" style="margin-top:14px">일정 ${S.events.length}개 · 한 줄 기록 ${Object.keys(S.notes).length}개 · 일간 답 ${Object.keys(S.answers).length}개 · 날씨 ${Object.keys(S.weather).length}일 · 데이터는 이 기기 안에만 저장돼요.<br>저장 공간 사용 ${storageUse()} (브라우저 한도 약 5MB)</div>`;
   const form=openSheet('설정',body,{submitLabel:'저장',onSubmit:f=>{
     const rows=[...f.querySelectorAll('.krow')]; const kinds=[];
     for(const r of rows){ const name=r.querySelector('[data-k=name]').value.trim().slice(0,12); const icon=firstGrapheme(r.querySelector('[data-k=icon]').value)||'📌'; if(!name){ r.querySelector('[data-k=name]').focus(); return toast('종류 이름을 입력해 주세요') } kinds.push({id:r.dataset.id,icon,name}) }
@@ -1342,15 +1371,16 @@ function settingsSheet(){
   ws.addEventListener('click',()=>{ S.settings.weekStart=S.settings.weekStart===1?0:1; ws.classList.toggle('on',S.settings.weekStart===1); ws.setAttribute('aria-checked',S.settings.weekStart===1); save(); render() });
   form.theme.addEventListener('change',()=>{ S.settings.theme=form.theme.value; applyTheme() });
   const wb=form.querySelector('#wipeBtn');
-  wb.addEventListener('click',()=>{ if(!wb.dataset.armed){wb.dataset.armed='1';wb.textContent='정말 모두 지우기';return} S.events=[]; S.notes={}; S.sampleNotes=[]; S.answers={}; S.sampleAnswers=[]; save(); closeSheet(); render(); toast('모든 일정·기록·답을 지웠어요') });
+  wb.addEventListener('click',()=>{ if(!wb.dataset.armed){wb.dataset.armed='1';wb.textContent='정말 모두 지우기';return} S.events=[]; S.notes={}; S.sampleNotes=[]; S.answers={}; S.sampleAnswers=[]; S.weather={}; save(); closeSheet(); render(); toast('모든 일정·기록·답을 지웠어요') });
 }
+function storageUse(){ let chars=0; try{ chars=JSON.stringify(S).length }catch(e){} const kb=chars*2/1024; return kb<1024?`약 ${Math.max(1,Math.round(kb))}KB`:`약 ${(kb/1024).toFixed(1)}MB` }
 function applyTheme(){ const th=S.settings.theme; if(th==='light'||th==='dark') document.documentElement.setAttribute('data-theme',th); else document.documentElement.removeAttribute('data-theme') }
 
 /* 백업 */
 function backupSheet(){
   const notes={}; for(const [d,v] of Object.entries(S.notes)) if(!S.sampleNotes.includes(d)) notes[d]=v;
   const answers={}; for(const [d,v] of Object.entries(S.answers)) if(!S.sampleAnswers.includes(d)) answers[d]=v;
-  const json=JSON.stringify({app:'sched-cal',version:3,exportedAt:new Date().toISOString(),settings:S.settings,events:S.events.filter(e=>!e.sample),notes,answers});
+  const json=JSON.stringify({app:'sched-cal',version:3,exportedAt:new Date().toISOString(),settings:S.settings,events:S.events.filter(e=>!e.sample),notes,answers,weather:S.weather});
   const fname=`일정달력-${today()}.json`;
   const nEv=S.events.filter(e=>!e.sample).length, nNote=Object.keys(notes).length, nAns=Object.keys(answers).length;
   const body=`<div class="small muted">데이터는 이 폰의 브라우저 안에만 있어요. 폰을 바꾸거나 브라우저 데이터를 지우면 사라지니 가끔 백업해 두세요. 폰에서는 "파일로 공유"가 제일 편해요. AirDrop이나 카카오톡 나에게 보내기, iCloud Drive로 보낼 수 있어요.</div>
@@ -1363,7 +1393,7 @@ function backupSheet(){
   form.querySelector('#shareBtn').addEventListener('click',async()=>{ try{ const file=new File([json],fname,{type:'application/json'}); if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'일정 달력 백업'}); toast('공유 창을 열었어요') } else if(navigator.share){ await navigator.share({title:'일정 달력 백업',text:json}); toast('텍스트로 공유했어요') } else toast('이 브라우저는 공유를 지원하지 않아요. 복사나 파일 저장을 써 주세요') }catch(e){ if(e&&e.name!=='AbortError') toast('공유하지 못했어요. 복사나 파일 저장을 써 주세요') } });
   form.querySelector('#importFile').addEventListener('change',ev=>{ const f=ev.target.files&&ev.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{ form.querySelector('#importBox').value=String(r.result||''); toast(`${f.name} 읽었어요. 합치기 또는 덮어쓰기를 눌러 주세요`) }; r.onerror=()=>toast('파일을 읽지 못했어요'); r.readAsText(f) });
   const parseIn=()=>{ try{ const d=JSON.parse(form.querySelector('#importBox').value); if(!d||!Array.isArray(d.events)) throw 0; return migrate(d) }catch(e){ toast('형식이 맞지 않아요. 백업한 내용 전체를 붙여넣어 주세요'); return null } };
-  form.querySelector('#mergeBtn').addEventListener('click',()=>{ const d=parseIn(); if(!d) return; let n=0,m=0; for(const k of d.settings.kinds) if(!S.settings.kinds.some(x=>x.id===k.id)) S.settings.kinds.push(k); for(const e of d.events){ if(S.events.some(x=>x.id===e.id)) continue; S.events.push(e); n++ } for(const [k,v] of Object.entries(d.notes)){ if(S.notes[k]) continue; S.notes[k]=v; m++ } let a=0; for(const [k,v] of Object.entries(d.answers)){ if(S.answers[k]) continue; S.answers[k]=v; a++ } for(const [k,v] of Object.entries(d.settings.questions)) if(!S.settings.questions[k]) S.settings.questions[k]=v; save(); closeSheet(); render(); toast(`일정 ${n}개, 기록 ${m}개, 답 ${a}개를 가져왔어요`) });
+  form.querySelector('#mergeBtn').addEventListener('click',()=>{ const d=parseIn(); if(!d) return; let n=0,m=0; for(const k of d.settings.kinds) if(!S.settings.kinds.some(x=>x.id===k.id)) S.settings.kinds.push(k); for(const e of d.events){ if(S.events.some(x=>x.id===e.id)) continue; S.events.push(e); n++ } for(const [k,v] of Object.entries(d.notes)){ if(S.notes[k]) continue; S.notes[k]=v; m++ } let a=0; for(const [k,v] of Object.entries(d.answers)){ if(S.answers[k]) continue; S.answers[k]=v; a++ } for(const [k,v] of Object.entries(d.weather)) if(!S.weather[k]) S.weather[k]=v; for(const [k,v] of Object.entries(d.settings.questions)) if(!S.settings.questions[k]) S.settings.questions[k]=v; save(); closeSheet(); render(); toast(`일정 ${n}개, 기록 ${m}개, 답 ${a}개를 가져왔어요`) });
   const rb=form.querySelector('#replaceBtn'); rb.addEventListener('click',()=>{ if(!rb.dataset.armed){rb.dataset.armed='1';rb.textContent='정말 덮어쓰기';return} const d=parseIn(); if(!d) return; d.settings=Object.assign({},S.settings,d.settings||{}); S=d; save(); closeSheet(); render(); toast('덮어썼어요') });
 }
 
@@ -1397,6 +1427,7 @@ const ACTIONS={
   'day':d=>{ if(V.sel===d.date){ editSheet(newEvent(d.date),{isNew:true}); return } V.sel=d.date; if(d.date.slice(0,7)!==V.month){ V.month=d.date.slice(0,7) } saveView(); render() },
   'edit':d=>{ const ev=S.events.find(q=>q.id===d.id); if(ev) editSheet(ev) },
   'note':d=>noteSheet(d.date),
+  'weather':d=>weatherSheet(d.date),
   'add':d=>{ let date=d.date; if(!date){ if(V.tab==='week'){ const mon=V.week||mondayOf(today()); const t=today(); date=(t>=mon&&t<=addDays(mon,6))?t:mon } else date=V.sel } editSheet(newEvent(date),{isNew:true}) },
   'clear-sample':()=>{ S.events=S.events.filter(e=>!e.sample); for(const d of S.sampleNotes) delete S.notes[d]; S.sampleNotes=[]; for(const d of S.sampleAnswers) delete S.answers[d]; S.sampleAnswers=[]; save(); render(); toast('예시를 지웠어요') },
 };
